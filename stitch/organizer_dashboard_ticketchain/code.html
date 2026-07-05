@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TicketChain - Organizer Overview</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Sora:wght@400;600;700&amp;family=Syne:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind Config from Brand Anchors -->
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "secondary": "#f0bf6b",
+                      "on-primary-container": "#ff8591",
+                      "on-error": "#690005",
+                      "on-primary-fixed-variant": "#881b2f",
+                      "on-error-container": "#ffdad6",
+                      "primary": "#ffb2b7",
+                      "on-primary": "#67001b",
+                      "on-secondary-container": "#f4c26e",
+                      "primary-container": "#7d1128",
+                      "secondary-fixed": "#ffdeab",
+                      "on-background": "#e5e2e3",
+                      "surface": "#131314",
+                      "surface-container-high": "#2a2a2b",
+                      "surface-container-highest": "#353436",
+                      "inverse-primary": "#a93445",
+                      "on-tertiary-container": "#fd878d",
+                      "surface-container-low": "#1c1b1c",
+                      "on-tertiary-fixed-variant": "#802730",
+                      "on-surface-variant": "#debfc0",
+                      "on-tertiary": "#620f1c",
+                      "background": "#131314",
+                      "outline": "#a58a8b",
+                      "surface-container": "#201f20",
+                      "secondary-container": "#714e00",
+                      "surface-tint": "#ffb2b7",
+                      "error-container": "#93000a",
+                      "tertiary-fixed-dim": "#ffb3b5",
+                      "secondary-fixed-dim": "#f0bf6b",
+                      "on-surface": "#e5e2e3",
+                      "on-tertiary-fixed": "#40000b",
+                      "on-primary-fixed": "#40000e",
+                      "outline-variant": "#574142",
+                      "tertiary-fixed": "#ffdada",
+                      "on-secondary": "#422c00",
+                      "primary-fixed": "#ffdadb",
+                      "inverse-surface": "#e5e2e3",
+                      "error": "#ffb4ab",
+                      "surface-variant": "#353436",
+                      "inverse-on-surface": "#313031",
+                      "surface-container-lowest": "#0e0e0f",
+                      "on-secondary-fixed": "#281900",
+                      "surface-dim": "#131314",
+                      "tertiary": "#ffb3b5",
+                      "primary-fixed-dim": "#ffb2b7",
+                      "on-secondary-fixed-variant": "#5f4100",
+                      "surface-bright": "#39393a",
+                      "tertiary-container": "#751e28"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "gutter": "32px",
+                      "stack-sm": "1rem",
+                      "stack-md": "2rem",
+                      "unit": "8px",
+                      "margin-mobile": "20px",
+                      "margin-desktop": "64px",
+                      "stack-lg": "4rem",
+                      "container-max": "1280px"
+              },
+              "fontFamily": {
+                      "body-lg": [
+                              "Inter"
+                      ],
+                      "label-sm": [
+                              "Sora"
+                      ],
+                      "title-md": [
+                              "Sora"
+                      ],
+                      "headline-lg": [
+                              "Syne"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "headline-lg-mobile": [
+                              "Syne"
+                      ],
+                      "display-xl": [
+                              "Syne"
+                      ]
+              },
+              "fontSize": {
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "1.6",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-sm": [
+                              "14px",
+                              {
+                                      "lineHeight": "1.0",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "title-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "1.4",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "1.6",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-lg-mobile": [
+                              "32px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "display-xl": [
+                              "72px",
+                              {
+                                      "lineHeight": "1.1",
+                                      "letterSpacing": "-0.04em",
+                                      "fontWeight": "800"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+        /* Custom Utilities for Premium Look */
+        .glass-card {
+            background: rgba(42, 42, 43, 0.4);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(87, 65, 66, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(92, 10, 24, 0.15);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #5C0A18 0%, #7D1128 100%);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+        
+        .bg-pattern {
+            background-image: radial-gradient(rgba(255, 178, 183, 0.05) 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+
+        /* Chart placeholders styling */
+        .chart-grid {
+            background-size: 40px 40px;
+            background-image: 
+                linear-gradient(to right, rgba(87, 65, 66, 0.1) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(87, 65, 66, 0.1) 1px, transparent 1px);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-lg text-body-lg min-h-screen flex bg-pattern selection:bg-primary-container selection:text-white">
+<!-- SideNavBar (Shared Component) -->
+<nav class="bg-surface-container-low h-screen w-64 fixed left-0 top-0 shadow-lg flex flex-col py-stack-md z-40 hidden md:flex border-r border-outline-variant/30">
+<!-- Header -->
+<div class="px-6 mb-8 flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-surface-variant overflow-hidden border border-outline-variant/50 relative">
+<img class="w-full h-full object-cover" data-alt="A high-resolution, professional portrait of a stylish event organizer in a modern, dimly lit studio setting. The lighting is cinematic, highlighting the subject's features against a dark, premium background. The aesthetic reflects luxury and exclusivity, fitting a high-end tech platform." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAB8WmTd2o-XMEv7LhyxDvI99QiWpsusCN64nThm2o1afCIjlziX3XN5kMhtGUWj-yh-omzTTwwRxxI-v2wbgeRUSHhKe9cv4m3Mq_SsV7eM-RmB9f8bDIj-8nIwkbMxoffvpXcOWTgkBpAvbSpQ6yLVWb0pKWkbaAfYQ3Uq5VN9ZeFpLp5u0R8QZ8fO0Ykle7N14cmzNUYxVv5031eDUb3oiPVBOBnshbKoPVrkMMiA7XbBch7tGYIJhewvwhPUsTl5n5rSOo-sT0o"/>
+</div>
+<div>
+<h2 class="font-title-md text-[18px] font-bold text-on-surface leading-tight">Organizer Portal</h2>
+<p class="font-label-sm text-label-sm text-on-surface-variant font-normal mt-1">Stellar Network</p>
+</div>
+</div>
+<!-- CTA -->
+<div class="px-6 mb-8">
+<button class="w-full py-3 px-4 rounded-lg btn-primary text-white font-label-sm text-label-sm flex items-center justify-center gap-2 hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                Create Event
+            </button>
+</div>
+<!-- Navigation Links -->
+<ul class="flex flex-col gap-2 flex-grow">
+<!-- Active Tab: Overview -->
+<li>
+<a class="bg-primary-container text-on-primary-container rounded-lg mx-2 flex items-center gap-3 px-4 py-3 cursor-pointer active:opacity-80 transition-all group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-primary transition-colors">dashboard</span>
+<span class="font-label-sm text-label-sm">Overview</span>
+</a>
+</li>
+<!-- Inactive Tabs -->
+<li>
+<a class="text-on-surface-variant hover:bg-surface-container-highest rounded-lg mx-2 flex items-center gap-3 px-4 py-3 hover:bg-surface-variant transition-all cursor-pointer active:opacity-80 group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-primary transition-colors">event</span>
+<span class="font-label-sm text-label-sm group-hover:text-primary transition-colors">Events</span>
+</a>
+</li>
+<li>
+<a class="text-on-surface-variant hover:bg-surface-container-highest rounded-lg mx-2 flex items-center gap-3 px-4 py-3 hover:bg-surface-variant transition-all cursor-pointer active:opacity-80 group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-primary transition-colors">analytics</span>
+<span class="font-label-sm text-label-sm group-hover:text-primary transition-colors">Analytics</span>
+</a>
+</li>
+<li>
+<a class="text-on-surface-variant hover:bg-surface-container-highest rounded-lg mx-2 flex items-center gap-3 px-4 py-3 hover:bg-surface-variant transition-all cursor-pointer active:opacity-80 group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-primary transition-colors">group</span>
+<span class="font-label-sm text-label-sm group-hover:text-primary transition-colors">Attendees</span>
+</a>
+</li>
+<li>
+<a class="text-on-surface-variant hover:bg-surface-container-highest rounded-lg mx-2 flex items-center gap-3 px-4 py-3 hover:bg-surface-variant transition-all cursor-pointer active:opacity-80 group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-primary transition-colors">settings</span>
+<span class="font-label-sm text-label-sm group-hover:text-primary transition-colors">Settings</span>
+</a>
+</li>
+</ul>
+<!-- Footer Links -->
+<ul class="flex flex-col gap-2 mt-auto">
+<li>
+<a class="text-on-surface-variant hover:bg-surface-container-highest rounded-lg mx-2 flex items-center gap-3 px-4 py-3 hover:bg-surface-variant transition-all cursor-pointer active:opacity-80 group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-primary transition-colors">help</span>
+<span class="font-label-sm text-label-sm group-hover:text-primary transition-colors">Support</span>
+</a>
+</li>
+<li>
+<a class="text-on-surface-variant hover:bg-surface-container-highest rounded-lg mx-2 flex items-center gap-3 px-4 py-3 hover:bg-surface-variant transition-all cursor-pointer active:opacity-80 group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-primary transition-colors">logout</span>
+<span class="font-label-sm text-label-sm group-hover:text-primary transition-colors">Logout</span>
+</a>
+</li>
+</ul>
+</nav>
+<!-- Main Content Canvas -->
+<main class="flex-grow md:ml-64 p-margin-mobile md:p-margin-desktop min-h-screen relative overflow-hidden">
+<!-- Ambient Background Glows -->
+<div class="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[100px] -z-10 pointer-events-none"></div>
+<div class="absolute bottom-0 left-1/4 w-[600px] h-[600px] bg-secondary/5 rounded-full blur-[120px] -z-10 pointer-events-none"></div>
+<div class="max-w-container-max mx-auto space-y-stack-md">
+<!-- Page Header -->
+<header class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-stack-md">
+<div>
+<h1 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface mb-2">Organizer Overview</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">Welcome back. Here's what's happening with your events today.</p>
+</div>
+<div class="flex items-center gap-4">
+<button class="w-10 h-10 rounded-full bg-surface-container-high border border-outline-variant/30 flex items-center justify-center hover:bg-surface-variant transition-colors relative">
+<span class="material-symbols-outlined text-on-surface-variant text-[20px]">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full"></span>
+</button>
+<!-- Mobile Create Event Button -->
+<button class="md:hidden py-3 px-6 rounded-lg btn-primary text-white font-label-sm text-label-sm flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                        New Event
+                    </button>
+</div>
+</header>
+<!-- Analytics Grid -->
+<section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+<!-- Card 1 -->
+<div class="glass-card rounded-[24px] p-6 relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-[48px] text-primary">account_balance_wallet</span>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-2">Total Revenue</p>
+<p class="font-title-md text-[32px] font-bold text-on-surface mb-4">$124,500</p>
+<div class="flex items-center gap-2 text-primary">
+<span class="material-symbols-outlined text-[16px]">trending_up</span>
+<span class="font-label-sm text-[12px]">+12% this month</span>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="glass-card rounded-[24px] p-6 relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-[48px] text-secondary">local_activity</span>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-2">Tickets Sold</p>
+<p class="font-title-md text-[32px] font-bold text-on-surface mb-4">1,840</p>
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">schedule</span>
+<span class="font-label-sm text-[12px]">Across 12 events</span>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="glass-card rounded-[24px] p-6 relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-[48px] text-primary">campaign</span>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-2">Active Events</p>
+<p class="font-title-md text-[32px] font-bold text-on-surface mb-4">12</p>
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">check_circle</span>
+<span class="font-label-sm text-[12px]">3 ending soon</span>
+</div>
+</div>
+<!-- Card 4 -->
+<div class="glass-card rounded-[24px] p-6 relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-[48px] text-secondary">groups</span>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-2">Avg Attendance</p>
+<p class="font-title-md text-[32px] font-bold text-on-surface mb-4">94%</p>
+<div class="flex items-center gap-2 text-primary">
+<span class="material-symbols-outlined text-[16px]">trending_up</span>
+<span class="font-label-sm text-[12px]">+2% vs last year</span>
+</div>
+</div>
+</section>
+</div>
+</main>
+</body></html>

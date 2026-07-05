@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TicketChain - Event Discovery</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&amp;family=Sora:wght@400;600;700&amp;family=Syne:wght@700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary": "#f0bf6b",
+                        "on-primary-container": "#ff8591",
+                        "on-error": "#690005",
+                        "on-primary-fixed-variant": "#881b2f",
+                        "on-error-container": "#ffdad6",
+                        "primary": "#ffb2b7",
+                        "on-primary": "#67001b",
+                        "on-secondary-container": "#f4c26e",
+                        "primary-container": "#7d1128",
+                        "secondary-fixed": "#ffdeab",
+                        "on-background": "#e5e2e3",
+                        "surface": "#131314",
+                        "surface-container-high": "#2a2a2b",
+                        "surface-container-highest": "#353436",
+                        "inverse-primary": "#a93445",
+                        "on-tertiary-container": "#fd878d",
+                        "surface-container-low": "#1c1b1c",
+                        "on-tertiary-fixed-variant": "#802730",
+                        "on-surface-variant": "#debfc0",
+                        "on-tertiary": "#620f1c",
+                        "background": "#131314",
+                        "outline": "#a58a8b",
+                        "surface-container": "#201f20",
+                        "secondary-container": "#714e00",
+                        "surface-tint": "#ffb2b7",
+                        "error-container": "#93000a",
+                        "tertiary-fixed-dim": "#ffb3b5",
+                        "secondary-fixed-dim": "#f0bf6b",
+                        "on-surface": "#e5e2e3",
+                        "on-tertiary-fixed": "#40000b",
+                        "on-primary-fixed": "#40000e",
+                        "outline-variant": "#574142",
+                        "tertiary-fixed": "#ffdada",
+                        "on-secondary": "#422c00",
+                        "primary-fixed": "#ffdadb",
+                        "inverse-surface": "#e5e2e3",
+                        "error": "#ffb4ab",
+                        "surface-variant": "#353436",
+                        "inverse-on-surface": "#313031",
+                        "surface-container-lowest": "#0e0e0f",
+                        "on-secondary-fixed": "#281900",
+                        "surface-dim": "#131314",
+                        "tertiary": "#ffb3b5",
+                        "primary-fixed-dim": "#ffb2b7",
+                        "on-secondary-fixed-variant": "#5f4100",
+                        "surface-bright": "#39393a",
+                        "tertiary-container": "#751e28"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "32px",
+                        "stack-sm": "1rem",
+                        "stack-md": "2rem",
+                        "unit": "8px",
+                        "margin-mobile": "20px",
+                        "margin-desktop": "64px",
+                        "stack-lg": "4rem",
+                        "container-max": "1280px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Inter"],
+                        "label-sm": ["Sora"],
+                        "title-md": ["Sora"],
+                        "headline-lg": ["Syne"],
+                        "body-md": ["Inter"],
+                        "headline-lg-mobile": ["Syne"],
+                        "display-xl": ["Syne"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "label-sm": ["14px", { "lineHeight": "1.0", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "title-md": ["24px", { "lineHeight": "1.4", "fontWeight": "600" }],
+                        "headline-lg": ["48px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["32px", { "lineHeight": "1.2", "fontWeight": "700" }],
+                        "display-xl": ["72px", { "lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "800" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(19, 19, 20, 0.4);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .event-card-shadow {
+            box-shadow: 0 16px 40px -12px rgba(92, 10, 24, 0.15);
+        }
+        .text-gradient-gold {
+            background: linear-gradient(to right, #f0bf6b, #ffdeab);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-lg min-h-screen pt-24">
+<!-- TopNavBar (Destination/Ecosystem Root) -->
+<nav class="fixed top-0 w-full z-50 bg-surface/10 backdrop-blur-xl border-b border-white/5 shadow-[0_8px_32px_0_rgba(92,10,24,0.15)]">
+<div class="flex justify-between items-center px-margin-mobile md:px-margin-desktop py-4 max-w-container-max mx-auto">
+<div class="font-headline-lg-mobile text-headline-lg-mobile font-bold tracking-tight text-on-surface text-primary">
+                TicketChain
+            </div>
+<div class="hidden md:flex gap-8 items-center">
+<a class="font-body-lg text-body-lg text-secondary font-bold relative after:content-[''] after:absolute after:-bottom-2 after:left-1/2 after:-translate-x-1/2 after:w-1 after:h-1 after:bg-secondary after:rounded-full hover:text-primary transition-colors duration-300 active:scale-95 transition-transform" href="#">Events</a>
+<a class="font-body-lg text-body-lg text-on-surface-variant font-medium hover:text-primary transition-colors duration-300 active:scale-95 transition-transform" href="#">How It Works</a>
+<a class="font-body-lg text-body-lg text-on-surface-variant font-medium hover:text-primary transition-colors duration-300 active:scale-95 transition-transform" href="#">For Organizers</a>
+<a class="font-body-lg text-body-lg text-on-surface-variant font-medium hover:text-primary transition-colors duration-300 active:scale-95 transition-transform" href="#">Pricing</a>
+<a class="font-body-lg text-body-lg text-on-surface-variant font-medium hover:text-primary transition-colors duration-300 active:scale-95 transition-transform" href="#">Dashboard</a>
+</div>
+<div class="flex gap-4 items-center">
+<button class="hidden md:block font-label-sm text-label-sm text-on-surface-variant border border-outline-variant px-4 py-2 rounded-full hover:bg-surface-variant transition-colors">Get Started</button>
+<button class="font-label-sm text-label-sm text-white bg-gradient-to-r from-primary-container to-[#7D1128] px-6 py-2 rounded-full shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] hover:opacity-90 transition-opacity">Connect Wallet</button>
+</div>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-stack-lg space-y-stack-lg">
+<!-- Header Section -->
+<header class="text-center space-y-stack-sm max-w-2xl mx-auto">
+<h1 class="font-headline-lg text-headline-lg md:font-display-xl md:text-display-xl text-on-surface">
+                Discover <span class="text-gradient-gold">Exclusive</span> Events
+            </h1>
+<p class="font-body-md text-body-md text-on-surface-variant">
+                Secure your spot at the world's most premium gatherings. Verified on the Stellar network for guaranteed authenticity.
+            </p>
+</header>
+<!-- Search & Filter Bar -->
+<section class="glass-panel rounded-[24px] p-6 max-w-5xl mx-auto shadow-2xl relative z-20">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+<div class="space-y-2">
+<label class="font-label-sm text-label-sm text-on-surface-variant pl-1">Location</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">location_on</span>
+<input class="w-full bg-surface-container-high border-b border-surface-container-high focus:border-primary-container text-on-surface font-body-md text-body-md py-3 pl-10 pr-4 rounded-t-lg transition-colors focus:ring-0" placeholder="Global" type="text"/>
+</div>
+</div>
+<div class="space-y-2">
+<label class="font-label-sm text-label-sm text-on-surface-variant pl-1">Category</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">category</span>
+<select class="w-full bg-surface-container-high border-b border-surface-container-high focus:border-primary-container text-on-surface font-body-md text-body-md py-3 pl-10 pr-8 rounded-t-lg transition-colors focus:ring-0 appearance-none">
+<option>All Categories</option>
+<option>Tech Conferences</option>
+<option>Music Festivals</option>
+<option>Art Exhibitions</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-outline pointer-events-none">expand_more</span>
+</div>
+</div>
+<div class="space-y-2">
+<label class="font-label-sm text-label-sm text-on-surface-variant pl-1">Date</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">calendar_month</span>
+<input class="w-full bg-surface-container-high border-b border-surface-container-high focus:border-primary-container text-on-surface font-body-md text-body-md py-3 pl-10 pr-4 rounded-t-lg transition-colors focus:ring-0 [color-scheme:dark]" type="date"/>
+</div>
+</div>
+<div>
+<button class="w-full bg-secondary text-on-secondary font-label-sm text-label-sm py-3 rounded-lg hover:bg-secondary-fixed transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">search</span>
+                        Find Events
+                    </button>
+</div>
+</div>
+</section>
+<!-- Event Grid -->
+<section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
+<!-- Card 1 -->
+<article class="group relative bg-surface-container-low rounded-[24px] overflow-hidden border border-outline-variant/20 event-card-shadow transition-transform duration-500 hover:-translate-y-2">
+<div class="relative h-64 w-full">
+<img alt="Event Cover" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="A high-end tech conference stage bathed in dramatic blue and purple lighting. A sleek, minimalist podium stands center stage against a massive, ultra-high-definition LED screen displaying abstract generative art. The audience area is dimly lit, focusing attention on the brilliantly illuminated stage. The atmosphere conveys innovation, exclusivity, and premium venture-backed SaaS aesthetics. Dark mode compatible." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDP6lu93a_LUGsDHtwy9ipnn0VbmFRb1uTvCbT0T2Rf1XJyHh5yxT9XQ4sLc7k0OhGPzpfM3UNIygDbsR1t3Hs_vo9sPRSkAOS_Bkx-Yp9e9dJWH_f43OLC-p1m_qY-Jzvw0QHe0wU4UachEaLZhpBW6rToPxhbNA8bz2nivYvpETDRG1XYscVNQfRhwCAGTbxBUZRpVsyRGxiCQfnpii9aKEpO4MGdWxUf1izPxRS-6t61wbIoPchxBFbfhLLCBBZ4vD0Dq4dgucXG"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface to-transparent opacity-90"></div>
+<div class="absolute top-4 right-4 bg-surface/50 backdrop-blur-md px-3 py-1 rounded-full border border-white/10 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-primary" style="font-variation-settings: 'FILL' 1;">verified</span>
+<span class="font-label-sm text-[12px] text-on-surface">Stellar Verified</span>
+</div>
+<div class="absolute top-4 left-4 bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full font-label-sm text-[12px]">
+                        VIP Only
+                    </div>
+</div>
+<div class="p-6 relative">
+<div class="absolute -top-12 right-6 bg-surface-container-high px-4 py-2 rounded-lg border border-outline-variant/30 shadow-lg">
+<span class="font-title-md text-title-md text-secondary block leading-none">500 XLM</span>
+</div>
+<h3 class="font-title-md text-title-md text-on-surface mb-2">Web3 Summit 2024</h3>
+<div class="flex items-center gap-2 text-on-surface-variant font-body-md text-body-md mb-1">
+<span class="material-symbols-outlined text-[18px]">calendar_today</span>
+<span>Oct 15 - 17, 2024</span>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant font-body-md text-body-md mb-6">
+<span class="material-symbols-outlined text-[18px]">location_on</span>
+<span>Dubai, UAE</span>
+</div>
+<button class="w-full bg-transparent border border-primary-container text-primary font-label-sm text-label-sm py-3 rounded-lg group-hover:bg-primary-container group-hover:text-white transition-all duration-300 opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 absolute bottom-6 left-0 right-0 mx-6 w-[calc(100%-48px)]">
+                        Get Tickets
+                    </button>
+<!-- Spacer for hover button -->
+<div class="h-12"></div>
+</div>
+</article>
+<!-- Card 2 -->
+<article class="group relative bg-surface-container-low rounded-[24px] overflow-hidden border border-outline-variant/20 event-card-shadow transition-transform duration-500 hover:-translate-y-2">
+<div class="relative h-64 w-full">
+<img alt="Event Cover" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="An exclusive underground electronic music festival set in a raw, industrial concrete bunker. Atmospheric fog rolls across the floor, pierced by precise, sharp ruby-red laser lights cutting through the darkness. A DJ silhouette stands behind a sleek mixing desk. The scene exudes luxury nightlife, deep shadows, and high-energy exclusivity perfectly aligned with a premium dark-mode aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAMfOdXQOeRwMhZ9LCTtR341AUmaHLhJXotZeNOyafiazswX7aur0ctsF5PqjhIjbH94uTooSUfzvTqSM0byjSr4Cim9aAmZJkUlZlkF7YnJgKA5lSc4CJxQaKmQ_zZdQX4qzHrk1f2Wcd1H-x0gTEwz3kWLkYMNnNURvWWNQFvGM3Jx1M4yMl144tgg-42wCxHls3MZjoJ0GBeN_yO39PVgOwC7Za6psbyI6uIqqkRCy5RhLawgxv30EDMzppE1BZpO8t45JPCdlwV"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface to-transparent opacity-90"></div>
+<div class="absolute top-4 right-4 bg-surface/50 backdrop-blur-md px-3 py-1 rounded-full border border-white/10 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-primary" style="font-variation-settings: 'FILL' 1;">verified</span>
+<span class="font-label-sm text-[12px] text-on-surface">Stellar Verified</span>
+</div>
+</div>
+<div class="p-6 relative">
+<div class="absolute -top-12 right-6 bg-surface-container-high px-4 py-2 rounded-lg border border-outline-variant/30 shadow-lg">
+<span class="font-title-md text-title-md text-secondary block leading-none">150 XLM</span>
+</div>
+<h3 class="font-title-md text-title-md text-on-surface mb-2">Neon Nights Underground</h3>
+<div class="flex items-center gap-2 text-on-surface-variant font-body-md text-body-md mb-1">
+<span class="material-symbols-outlined text-[18px]">calendar_today</span>
+<span>Nov 02, 2024</span>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant font-body-md text-body-md mb-6">
+<span class="material-symbols-outlined text-[18px]">location_on</span>
+<span>Berlin, Germany</span>
+</div>
+<button class="w-full bg-transparent border border-primary-container text-primary font-label-sm text-label-sm py-3 rounded-lg group-hover:bg-primary-container group-hover:text-white transition-all duration-300 opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 absolute bottom-6 left-0 right-0 mx-6 w-[calc(100%-48px)]">
+                        Get Tickets
+                    </button>
+<div class="h-12"></div>
+</div>
+</article>
+<!-- Card 3 -->
+<article class="group relative bg-surface-container-low rounded-[24px] overflow-hidden border border-outline-variant/20 event-card-shadow transition-transform duration-500 hover:-translate-y-2">
+<div class="relative h-64 w-full">
+<img alt="Event Cover" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="A serene, high-end contemporary art gallery exhibition at night. The minimalist space features stark white walls contrasting with the rich black floor. A single, large, glowing golden geometric sculpture is dramatically spotlit in the center of the room. Soft, atmospheric lighting creates deep shadows, emphasizing a luxurious, contemplative, and premium aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDrCgEKok4VSOqDZeOrtgq0tfvVLtXOK7dGRk2JNC37I9mP4H-ohM-N6ofsrSABq76Dw3DmfenuMFF0LmRBRiqkE1mXIbzb7GHsQcpkudTAJRj-UPXJ9u4XOxNU-JMaM0gRdzpPzsk4fWhk7wgm-rYZEAw06y40fGk5gKdDctmynqpFVhfNBJfW3WTAK6fyoXSIlQKx5bcKdTIC59T8RN_FonOp0XAwRTIqLxnjOtj8AIwY-aYEgML4bb6UBrpkiZOZ-VRL8wOO9I7x"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface to-transparent opacity-90"></div>
+<div class="absolute top-4 right-4 bg-surface/50 backdrop-blur-md px-3 py-1 rounded-full border border-white/10 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-primary" style="font-variation-settings: 'FILL' 1;">verified</span>
+<span class="font-label-sm text-[12px] text-on-surface">Stellar Verified</span>
+</div>
+<div class="absolute top-4 left-4 bg-surface-variant text-on-surface px-3 py-1 rounded-full font-label-sm text-[12px] border border-outline-variant/50">
+                        Early Bird
+                    </div>
+</div>
+<div class="p-6 relative">
+<div class="absolute -top-12 right-6 bg-surface-container-high px-4 py-2 rounded-lg border border-outline-variant/30 shadow-lg">
+<span class="font-title-md text-title-md text-secondary block leading-none">200 XLM</span>
+</div>
+<h3 class="font-title-md text-title-md text-on-surface mb-2">Digital Renaissance Expo</h3>
+<div class="flex items-center gap-2 text-on-surface-variant font-body-md text-body-md mb-1">
+<span class="material-symbols-outlined text-[18px]">calendar_today</span>
+<span>Dec 10 - 14, 2024</span>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant font-body-md text-body-md mb-6">
+<span class="material-symbols-outlined text-[18px]">location_on</span>
+<span>Tokyo, Japan</span>
+</div>
+<button class="w-full bg-transparent border border-primary-container text-primary font-label-sm text-label-sm py-3 rounded-lg group-hover:bg-primary-container group-hover:text-white transition-all duration-300 opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 absolute bottom-6 left-0 right-0 mx-6 w-[calc(100%-48px)]">
+                        Get Tickets
+                    </button>
+<div class="h-12"></div>
+</div>
+</article>
+</section>
+<!-- Load More / Empty State Area -->
+<div class="flex justify-center pt-stack-sm pb-stack-lg">
+<button class="font-label-sm text-label-sm text-on-surface-variant border border-outline-variant px-8 py-3 rounded-full hover:bg-surface-variant hover:text-on-surface transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined">sync</span>
+                Load More Events
+             </button>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container-lowest border-t border-outline-variant w-full">
+<div class="grid grid-cols-2 md:grid-cols-4 gap-gutter px-margin-mobile md:px-margin-desktop py-stack-lg max-w-container-max mx-auto relative">
+<div class="col-span-2 md:col-span-1 space-y-4">
+<div class="font-headline-lg-mobile text-headline-lg-mobile text-primary font-bold">
+                    TicketChain
+                </div>
+<p class="font-body-md text-body-md text-on-surface-variant">
+                    © 2024 TicketChain. Built on Stellar.
+                </p>
+</div>
+<div class="space-y-4">
+<h4 class="font-label-sm text-label-sm text-on-surface">Platform</h4>
+<div class="flex flex-col gap-2">
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary transition-colors" href="#">Product</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary transition-colors" href="#">Features</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary transition-colors" href="#">Security</a>
+</div>
+</div>
+<div class="space-y-4">
+<h4 class="font-label-sm text-label-sm text-on-surface">Company</h4>
+<div class="flex flex-col gap-2">
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary transition-colors" href="#">About</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary transition-colors" href="#">Press</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary transition-colors" href="#">Privacy</a>
+</div>
+</div>
+<div class="space-y-4 hidden md:block">
+<!-- Placeholder for symmetry or social links -->
+<div class="w-16 h-16 rounded-full bg-surface-container-low border border-outline-variant/30 flex items-center justify-center">
+<span class="material-symbols-outlined text-outline">language</span>
+</div>
+</div>
+</div>
+</footer>
+</body></html>

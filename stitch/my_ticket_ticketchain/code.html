@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Ticket Details - TicketChain</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Sora:wght@400;600;700&amp;family=Syne:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary": "#f0bf6b",
+                        "on-primary-container": "#ff8591",
+                        "on-error": "#690005",
+                        "on-primary-fixed-variant": "#881b2f",
+                        "on-error-container": "#ffdad6",
+                        "primary": "#ffb2b7",
+                        "on-primary": "#67001b",
+                        "on-secondary-container": "#f4c26e",
+                        "primary-container": "#7d1128",
+                        "secondary-fixed": "#ffdeab",
+                        "on-background": "#e5e2e3",
+                        "surface": "#131314",
+                        "surface-container-high": "#2a2a2b",
+                        "surface-container-highest": "#353436",
+                        "inverse-primary": "#a93445",
+                        "on-tertiary-container": "#fd878d",
+                        "surface-container-low": "#1c1b1c",
+                        "on-tertiary-fixed-variant": "#802730",
+                        "on-surface-variant": "#debfc0",
+                        "on-tertiary": "#620f1c",
+                        "background": "#131314",
+                        "outline": "#a58a8b",
+                        "surface-container": "#201f20",
+                        "secondary-container": "#714e00",
+                        "surface-tint": "#ffb2b7",
+                        "error-container": "#93000a",
+                        "tertiary-fixed-dim": "#ffb3b5",
+                        "secondary-fixed-dim": "#f0bf6b",
+                        "on-surface": "#e5e2e3",
+                        "on-tertiary-fixed": "#40000b",
+                        "on-primary-fixed": "#40000e",
+                        "outline-variant": "#574142",
+                        "tertiary-fixed": "#ffdada",
+                        "on-secondary": "#422c00",
+                        "primary-fixed": "#ffdadb",
+                        "inverse-surface": "#e5e2e3",
+                        "error": "#ffb4ab",
+                        "surface-variant": "#353436",
+                        "inverse-on-surface": "#313031",
+                        "surface-container-lowest": "#0e0e0f",
+                        "on-secondary-fixed": "#281900",
+                        "surface-dim": "#131314",
+                        "tertiary": "#ffb3b5",
+                        "primary-fixed-dim": "#ffb2b7",
+                        "on-secondary-fixed-variant": "#5f4100",
+                        "surface-bright": "#39393a",
+                        "tertiary-container": "#751e28"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "32px",
+                        "stack-sm": "1rem",
+                        "stack-md": "2rem",
+                        "unit": "8px",
+                        "margin-mobile": "20px",
+                        "margin-desktop": "64px",
+                        "stack-lg": "4rem",
+                        "container-max": "1280px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Inter"],
+                        "label-sm": ["Sora"],
+                        "title-md": ["Sora"],
+                        "headline-lg": ["Syne"],
+                        "body-md": ["Inter"],
+                        "headline-lg-mobile": ["Syne"],
+                        "display-xl": ["Syne"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "label-sm": ["14px", { "lineHeight": "1.0", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "title-md": ["24px", { "lineHeight": "1.4", "fontWeight": "600" }],
+                        "headline-lg": ["48px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["32px", { "lineHeight": "1.2", "fontWeight": "700" }],
+                        "display-xl": ["72px", { "lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "800" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .hologram-effect {
+            background: linear-gradient(125deg, transparent 20%, rgba(255, 255, 255, 0.1) 40%, rgba(240, 191, 107, 0.3) 50%, rgba(255, 255, 255, 0.1) 60%, transparent 80%);
+            background-size: 200% 200%;
+            animation: hologram 4s infinite linear;
+            pointer-events: none;
+        }
+        @keyframes hologram {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        .ticket-shadow {
+            box-shadow: 0 32px 64px -12px rgba(92, 10, 24, 0.25), 0 0 40px 0 rgba(240, 191, 107, 0.05);
+        }
+    </style>
+</head>
+<body class="bg-[#1A1A1D] text-on-surface min-h-screen relative overflow-x-hidden antialiased">
+<!-- Atmospheric Background Layers -->
+<div class="fixed inset-0 pointer-events-none z-0">
+<div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-primary-container rounded-full blur-[120px] opacity-10"></div>
+<div class="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] bg-secondary-container rounded-full blur-[150px] opacity-10"></div>
+</div>
+<!-- Top Navigation (Shell suppressed for this focused details page) -->
+<main class="relative z-10 w-full min-h-screen flex flex-col items-center justify-center py-stack-lg px-margin-mobile md:px-margin-desktop">
+<!-- Ticket Container -->
+<div class="w-full max-w-md mx-auto">
+<!-- The Luxury Digital Ticket -->
+<div class="relative w-full aspect-[1/2] rounded-[32px] bg-surface-container-low border border-outline-variant/30 overflow-hidden ticket-shadow flex flex-col">
+<!-- Hologram Overlay -->
+<div class="absolute inset-0 hologram-effect z-20 mix-blend-overlay"></div>
+<!-- Event Banner -->
+<div class="relative h-1/3 w-full shrink-0">
+<img class="absolute inset-0 w-full h-full object-cover" data-alt="A highly detailed, atmospheric shot of an electronic music festival at night. Neon lights in deep burgundy, vibrant magenta, and electric gold pierce through thick synthetic fog. The crowd is a silhouette against a massive, futuristic LED stage setup. The mood is energetic, premium, and exclusive, fitting a luxury digital ticket platform aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBGHgQ5_Hjxs8zv3uOokg2LNZkpR1BxN6d3Kc9-OgQO41LggDgKA5uvbinUPv-Qr62vbtFtG4tNYc2FKMGQBheDwgP8gCKyYCl7PvevIKzkoHZIm9yHY63AxClJ0SuvZPTcInCtw_W1qZfIOaN3VhIqXsOK3suNRRXkv3HANJe3ap4Mjvlm-INKjlRnNKaaaPhP1OZqNhgpdWBye8MCmHTkdEcyk88mvVkocViuciGUtKGZvJoKUPRGugLhZdBq4_BhrE8hG0bD9USv"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-low to-transparent z-10"></div>
+<div class="absolute top-6 left-6 right-6 flex justify-between items-start z-20">
+<span class="bg-secondary/90 backdrop-blur text-on-secondary px-3 py-1 rounded-full font-label-sm text-label-sm uppercase tracking-widest shadow-lg">VIP Access</span>
+<span class="material-symbols-outlined text-white opacity-80">more_horiz</span>
+</div>
+</div>
+<!-- Ticket Core Details -->
+<div class="flex-1 px-8 py-6 flex flex-col relative z-20">
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-2 leading-tight">Neon Nights: <br/><span class="text-secondary">Electronic Music Festival</span></h1>
+<div class="space-y-4 mt-6">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary-container">calendar_today</span>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase">Date &amp; Time</p>
+<p class="font-body-md text-body-md text-on-surface mt-1">Nov 12, 2024 • 8:00 PM</p>
+</div>
+</div>
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary-container">location_on</span>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase">Venue</p>
+<p class="font-body-md text-body-md text-on-surface mt-1">The Grand Pavilion, NYC</p>
+</div>
+</div>
+</div>
+<!-- QR Code & Verification -->
+<div class="mt-auto pt-8 pb-4 flex flex-col items-center">
+<div class="w-40 h-40 bg-white rounded-xl p-3 shadow-[0_0_20px_rgba(255,255,255,0.1)] mb-6 relative">
+<!-- Placeholder for actual QR code image, using a pattern for now -->
+<div class="w-full h-full bg-[radial-gradient(#000_2px,transparent_2px)] [background-size:8px_8px] rounded-lg border-4 border-black"></div>
+<!-- Scanning line animation -->
+<div class="absolute top-0 left-0 w-full h-[2px] bg-secondary/80 shadow-[0_0_10px_#f0bf6b] animate-[scan_3s_ease-in-out_infinite]"></div>
+<style>
+                                 @keyframes scan {
+                                     0%, 100% { top: 10%; opacity: 0; }
+                                     10%, 90% { opacity: 1; }
+                                     50% { top: 90%; }
+                                 }
+                             </style>
+</div>
+<div class="flex items-center gap-2 bg-surface-container/50 border border-secondary/20 rounded-full px-4 py-2">
+<span class="material-symbols-outlined text-secondary text-sm" style="font-variation-settings: 'FILL' 1;">verified</span>
+<span class="font-label-sm text-label-sm text-secondary uppercase">Ownership Verified</span>
+</div>
+<div class="mt-4 text-center">
+<p class="font-body-md text-body-md text-on-surface-variant text-sm flex items-center justify-center gap-2">
+                                Owner: <span class="text-on-surface font-mono text-xs bg-surface-container-highest px-2 py-1 rounded">0xStellar...492b</span>
+</p>
+<a class="text-primary-container hover:text-primary transition-colors text-xs flex items-center justify-center gap-1 mt-2" href="#">
+                                View on Explorer <span class="material-symbols-outlined text-[14px]">open_in_new</span>
+</a>
+</div>
+</div>
+</div>
+</div>
+<!-- Action Buttons -->
+<div class="mt-stack-md flex flex-col gap-4">
+<button class="w-full bg-gradient-to-r from-primary-container to-[#5C0A18] text-white font-label-sm text-label-sm py-4 rounded-xl shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">account_balance_wallet</span>
+                    Add to Apple Wallet
+                </button>
+<div class="flex gap-4">
+<button class="flex-1 bg-transparent border border-primary-container text-primary-container font-label-sm text-label-sm py-4 rounded-xl hover:bg-primary-container/10 transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">send</span>
+                        Transfer Ticket
+                    </button>
+<button class="flex-1 text-on-surface-variant font-label-sm text-label-sm py-4 rounded-xl hover:bg-surface-container transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">download</span>
+                        Download PDF
+                    </button>
+</div>
+</div>
+</div>
+</main>
+</body></html>

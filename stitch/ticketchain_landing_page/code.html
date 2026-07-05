@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TicketChain - Fraud-Proof Ticketing For Modern Events</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Sora:wght@400;600;700&amp;family=Syne:wght@500;700;800&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "secondary": "#f0bf6b",
+                      "on-primary-container": "#ff8591",
+                      "on-error": "#690005",
+                      "on-primary-fixed-variant": "#881b2f",
+                      "on-error-container": "#ffdad6",
+                      "primary": "#ffb2b7",
+                      "on-primary": "#67001b",
+                      "on-secondary-container": "#f4c26e",
+                      "primary-container": "#7d1128",
+                      "secondary-fixed": "#ffdeab",
+                      "on-background": "#e5e2e3",
+                      "surface": "#131314",
+                      "surface-container-high": "#2a2a2b",
+                      "surface-container-highest": "#353436",
+                      "inverse-primary": "#a93445",
+                      "on-tertiary-container": "#fd878d",
+                      "surface-container-low": "#1c1b1c",
+                      "on-tertiary-fixed-variant": "#802730",
+                      "on-surface-variant": "#debfc0",
+                      "on-tertiary": "#620f1c",
+                      "background": "#131314",
+                      "outline": "#a58a8b",
+                      "surface-container": "#201f20",
+                      "secondary-container": "#714e00",
+                      "surface-tint": "#ffb2b7",
+                      "error-container": "#93000a",
+                      "tertiary-fixed-dim": "#ffb3b5",
+                      "secondary-fixed-dim": "#f0bf6b",
+                      "on-surface": "#e5e2e3",
+                      "on-tertiary-fixed": "#40000b",
+                      "on-primary-fixed": "#40000e",
+                      "outline-variant": "#574142",
+                      "tertiary-fixed": "#ffdada",
+                      "on-secondary": "#422c00",
+                      "primary-fixed": "#ffdadb",
+                      "inverse-surface": "#e5e2e3",
+                      "error": "#ffb4ab",
+                      "surface-variant": "#353436",
+                      "inverse-on-surface": "#313031",
+                      "surface-container-lowest": "#0e0e0f",
+                      "on-secondary-fixed": "#281900",
+                      "surface-dim": "#131314",
+                      "tertiary": "#ffb3b5",
+                      "primary-fixed-dim": "#ffb2b7",
+                      "on-secondary-fixed-variant": "#5f4100",
+                      "surface-bright": "#39393a",
+                      "tertiary-container": "#751e28"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px",
+                      "2xl": "1rem",
+                      "3xl": "1.5rem"
+              },
+              "spacing": {
+                      "gutter": "32px",
+                      "stack-sm": "1rem",
+                      "stack-md": "2rem",
+                      "unit": "8px",
+                      "margin-mobile": "20px",
+                      "margin-desktop": "64px",
+                      "stack-lg": "4rem",
+                      "container-max": "1280px"
+              },
+              "fontFamily": {
+                      "body-lg": ["Inter", "sans-serif"],
+                      "label-sm": ["Sora", "sans-serif"],
+                      "title-md": ["Sora", "sans-serif"],
+                      "headline-lg": ["Syne", "sans-serif"],
+                      "body-md": ["Inter", "sans-serif"],
+                      "headline-lg-mobile": ["Syne", "sans-serif"],
+                      "display-xl": ["Syne", "sans-serif"]
+              },
+              "fontSize": {
+                      "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                      "label-sm": ["14px", {"lineHeight": "1.0", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                      "title-md": ["24px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                      "headline-lg": ["48px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                      "headline-lg-mobile": ["32px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                      "display-xl": ["72px", {"lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "800"}]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(28, 27, 28, 0.4);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(222, 191, 192, 0.1);
+        }
+        .premium-shadow {
+            box-shadow: 0 20px 60px -10px rgba(92, 10, 24, 0.15);
+        }
+        .text-gradient-gold {
+            background: linear-gradient(135deg, #f0bf6b 0%, #ffdeab 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .btn-primary-gradient {
+            background: linear-gradient(180deg, #7d1128 0%, #5c0a18 100%);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+        .ticket-glow {
+            position: relative;
+        }
+        .ticket-glow::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            background: linear-gradient(45deg, #7d1128, transparent, #f0bf6b);
+            z-index: -1;
+            filter: blur(10px);
+            opacity: 0.5;
+            border-radius: inherit;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md antialiased overflow-x-hidden selection:bg-primary-container selection:text-white">
+<!-- Top Navigation (Shared Component) -->
+<nav class="fixed top-0 w-full z-50 bg-surface/10 backdrop-blur-xl border-b border-white/5 shadow-[0_8px_32px_0_rgba(92,10,24,0.15)]">
+<div class="flex justify-between items-center px-margin-mobile md:px-margin-desktop py-4 max-w-container-max mx-auto">
+<div class="flex items-center gap-2">
+<span class="font-headline-lg-mobile text-headline-lg-mobile font-bold tracking-tight text-on-surface">TicketChain</span>
+</div>
+<div class="hidden md:flex items-center gap-8">
+<a class="text-on-surface-variant font-medium hover:text-primary transition-colors duration-300 font-body-lg text-body-lg text-secondary font-bold relative after:content-[''] after:absolute after:-bottom-2 after:left-1/2 after:-translate-x-1/2 after:w-1 after:h-1 after:bg-secondary after:rounded-full" href="#">Events</a>
+<a class="text-on-surface-variant font-medium hover:text-primary transition-colors duration-300 font-body-lg text-body-lg" href="#">How It Works</a>
+<a class="text-on-surface-variant font-medium hover:text-primary transition-colors duration-300 font-body-lg text-body-lg" href="#">For Organizers</a>
+<a class="text-on-surface-variant font-medium hover:text-primary transition-colors duration-300 font-body-lg text-body-lg" href="#">Pricing</a>
+<a class="text-on-surface-variant font-medium hover:text-primary transition-colors duration-300 font-body-lg text-body-lg" href="#">Dashboard</a>
+</div>
+<div class="hidden md:flex items-center gap-4">
+<button class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors px-4 py-2 border border-transparent">Get Started</button>
+<button class="btn-primary-gradient px-6 py-2.5 rounded-full font-label-sm text-label-sm text-white active:scale-95 transition-transform flex items-center gap-2">
+                    Connect Wallet
+                </button>
+</div>
+<!-- Mobile Menu Toggle -->
+<button class="md:hidden text-on-surface p-2">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">menu</span>
+</button>
+</div>
+</nav>
+<main class="pt-[100px]">
+<!-- SECTION 1 - HERO -->
+<section class="relative min-h-[921px] flex items-center px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto py-stack-lg">
+<!-- Background atmosphere -->
+<div class="absolute inset-0 pointer-events-none overflow-hidden">
+<div class="absolute top-1/4 -left-1/4 w-1/2 h-1/2 bg-primary-container/20 rounded-full blur-[120px]"></div>
+<div class="absolute bottom-1/4 -right-1/4 w-1/2 h-1/2 bg-secondary/10 rounded-full blur-[100px]"></div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-gutter relative z-10 w-full items-center">
+<!-- Left Content -->
+<div class="flex flex-col gap-stack-md">
+<div class="space-y-4">
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-secondary/30 bg-secondary/10">
+<span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
+<span class="font-label-sm text-label-sm text-secondary">Stellar Network Live</span>
+</div>
+<h1 class="font-display-xl text-display-xl text-on-surface leading-tight">
+                            Fraud-Proof Ticketing For <span class="text-gradient-gold">Modern Events</span>
+</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-xl">
+                            Create, sell, transfer, and verify blockchain-backed event tickets powered by Stellar.
+                        </p>
+</div>
+<div class="flex flex-wrap items-center gap-4">
+<button class="btn-primary-gradient px-8 py-4 rounded-full font-title-md text-[18px] text-white hover:opacity-90 transition-opacity active:scale-95 shadow-lg shadow-primary-container/30">
+                            Explore Events
+                        </button>
+<button class="px-8 py-4 rounded-full font-title-md text-[18px] text-on-surface border border-primary-container hover:bg-surface-container-high transition-colors active:scale-95">
+                            Create Event
+                        </button>
+</div>
+<div class="flex items-center gap-8 pt-stack-sm border-t border-white/5 mt-4">
+<div>
+<p class="font-title-md text-title-md text-on-surface">10,000+</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Tickets Verified</p>
+</div>
+<div class="w-px h-8 bg-white/10"></div>
+<div>
+<p class="font-title-md text-title-md text-on-surface">500+</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Events Hosted</p>
+</div>
+</div>
+</div>
+<!-- Right Content: Floating Ticket Mockup -->
+<div class="relative w-full aspect-[4/5] max-w-[500px] mx-auto lg:ml-auto perspective-1000">
+<div class="w-full h-full relative ticket-glow transform rotate-y-[-10deg] rotate-x-[5deg] hover:rotate-y-0 hover:rotate-x-0 transition-transform duration-700">
+<div class="absolute inset-0 bg-surface-container-highest rounded-3xl overflow-hidden glass-panel premium-shadow flex flex-col">
+<!-- Ticket Header Image -->
+<div class="h-2/5 w-full relative">
+<div class="absolute inset-0 bg-cover bg-center" data-alt="A futuristic cityscape of San Francisco at sunset, viewed from a high vantage point. The scene is illuminated by warm golden hour light mixed with subtle neon accents. The mood is sophisticated, dynamic, and high-tech, representing a premium tech summit. Colors are deep purples, warm golds, and rich dark tones." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAEf1B2IrPz5fNseHX-9O4OULJA8WyflADULtrH6VpqeexaNqp3y-Eg2xrU5WfvtrgRonf5ExyjV2dOF3AgaGir5xrk1zaXQdGsY5IFL3i0QMeB2KU_bG0txZVNlOFJROXAGlrVii7XgfeoCt_it0LiKfT-QMqDAxCfgxcZyDPMXIYloSSmvyJeQ0cE3BpWFLNjdBYUWtg5KKQGM4USBbj7NoMbarUMfa1y_CfIEIsZ2kyARR1bwOv175_1OwGMsZXdAsHq4cZekl4z')"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-highest to-transparent"></div>
+<div class="absolute top-4 right-4 bg-background/80 backdrop-blur-md px-3 py-1.5 rounded-full flex items-center gap-1.5 border border-white/10">
+<span class="material-symbols-outlined text-secondary text-[16px]" style="font-variation-settings: 'FILL' 1;">verified</span>
+<span class="font-label-sm text-[12px] text-secondary">Verified</span>
+</div>
+</div>
+<!-- Ticket Details -->
+<div class="p-8 flex-1 flex flex-col justify-between relative">
+<!-- Cutouts for ticket look -->
+<div class="absolute left-[-16px] top-0 w-8 h-8 rounded-full bg-background"></div>
+<div class="absolute right-[-16px] top-0 w-8 h-8 rounded-full bg-background"></div>
+<div class="w-full h-px border-t-2 border-dashed border-white/10 absolute top-4 left-0"></div>
+<div class="mt-4">
+<h3 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-2">Global Tech Summit 2024</h3>
+<div class="flex items-center gap-4 text-on-surface-variant font-label-sm text-label-sm">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">calendar_today</span> Oct 24</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">location_on</span> San Francisco</span>
+</div>
+</div>
+<div class="mt-auto flex justify-between items-end border-t border-white/5 pt-6">
+<div>
+<p class="font-label-sm text-[12px] text-on-surface-variant uppercase tracking-wider mb-1">Pass Type</p>
+<p class="font-title-md text-[20px] text-secondary">VIP Access</p>
+</div>
+<div class="w-20 h-20 bg-white rounded-lg p-2">
+<!-- Mock QR Code -->
+<div class="w-full h-full bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cGF0aCBmaWxsPSIjMDAwIiBkPSJNMCAwaDQwdjQwaC00MHptMTAgMTBoMjB2MjBoLTIwem01MCAwaDQwdjQwaC00MHptMTAgMTBoMjB2MjBoLTIwem0tNTAgNTBoNDB2NDBoLTQwem0xMCAxMGgyMHYyMGgtMjB6bTQwLTEwaDEwdjEwaC0xMHptMjAgMGgyMHYyMGgtMjB6Ii8+PC9zdmc+')] bg-cover opacity-80"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- SECTION 5 - FEATURED EVENTS -->
+<section class="py-stack-lg px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto">
+<div class="flex justify-between items-end mb-stack-md">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-2">Featured Events</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Exclusive experiences secured on-chain.</p>
+</div>
+<button class="hidden md:flex items-center gap-2 text-primary hover:text-secondary transition-colors font-label-sm text-label-sm">
+                    View All <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
+<!-- Event Card 1 -->
+<div class="group relative rounded-3xl overflow-hidden glass-panel transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_20px_40px_-10px_rgba(92,10,24,0.3)]">
+<div class="aspect-[4/3] relative w-full overflow-hidden">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" data-alt="A vast outdoor music festival stage at night, illuminated by spectacular laser lights and pyrotechnics. A massive crowd is silhouetted against the bright stage. The atmosphere is energetic and premium. The lighting is dominated by deep reds, burgundies, and striking white beams." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDhVq03uQjqvooBr87KGbqmjL2DnZ94xQ2jduFQQj8a_Q1AfuOkmG-FPBvBNNI3Yfp0eXqbPuazDhH5V2ut80ix_uvfR4PQDu10VbMyPA_z-co5G2cRF4BpduowcRPIrRQvSsTIPJ6AwmhG4wDMjZzL93o--hEyFNkCgDHgohBXtdjWKR5SJMHyHGMmg5N8r3e6MVFrp3M7bho9Si4wV2QcR0W1cVvBmfXAF_BkYc_rql73FHqk0V_0zexk48vsjTQWjlyk_0BQ0R19')"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-highest via-surface-container-highest/50 to-transparent"></div>
+<div class="absolute top-4 left-4 bg-surface-container-highest/80 backdrop-blur-md px-3 py-1 rounded-full">
+<span class="font-label-sm text-[12px] text-on-surface">Music</span>
+</div>
+</div>
+<div class="p-6 relative z-10 -mt-6">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-title-md text-title-md text-on-surface group-hover:text-primary transition-colors">Metropolis Music Festival</h3>
+</div>
+<div class="flex items-center gap-4 text-on-surface-variant font-label-sm text-label-sm mb-6">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">calendar_month</span> Nov 15</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">location_on</span> New York</span>
+</div>
+<div class="flex justify-between items-center border-t border-white/5 pt-4">
+<div>
+<span class="font-label-sm text-[12px] text-on-surface-variant block">Starting from</span>
+<span class="font-title-md text-[18px] text-secondary">250 XLM</span>
+</div>
+<button class="bg-primary-container/20 text-primary hover:bg-primary-container hover:text-white px-4 py-2 rounded-full font-label-sm text-label-sm transition-colors">
+                                Buy Ticket
+                            </button>
+</div>
+</div>
+<div class="absolute inset-0 border-2 border-transparent group-hover:border-primary-container/50 rounded-3xl transition-colors duration-300 pointer-events-none"></div>
+</div>
+<!-- Event Card 2 -->
+<div class="group relative rounded-3xl overflow-hidden glass-panel transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_20px_40px_-10px_rgba(92,10,24,0.3)]">
+<div class="aspect-[4/3] relative w-full overflow-hidden">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" data-alt="An elegant, high-end art gallery opening. Sophisticated attendees view minimalist modern art installations. The lighting is bright yet moody, focusing on the artworks. The color palette features stark whites, deep blacks, and subtle gold accents for a premium editorial feel." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAWYH0h5Tv1YAHqqIeJSoGIb4L7SHznM87pkZ4ehAlI8B_FneNIO4UzgzQlUtP5eeTzwgCDPOn5qyZL33_4qcv31bQdxSeIIVPtYyOexeys7t82UCApH-9V7ZBi127LmyfVc7jqc_1reZrehprPJz3hCpAzjIPPS8pyGgXVBAKtqrZF-90oAyRudMN_wIe_2GNesHiah8A42EDTz-DDrcIkMUtrHH_FsWl0N3WEX8tyvKl-BZJvcjGGk8eqRUJLGvaI6qYrCfLAbdpr')"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-highest via-surface-container-highest/50 to-transparent"></div>
+<div class="absolute top-4 left-4 bg-surface-container-highest/80 backdrop-blur-md px-3 py-1 rounded-full">
+<span class="font-label-sm text-[12px] text-on-surface">Art &amp; Design</span>
+</div>
+</div>
+<div class="p-6 relative z-10 -mt-6">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-title-md text-title-md text-on-surface group-hover:text-primary transition-colors">Modern Art Biennale</h3>
+</div>
+<div class="flex items-center gap-4 text-on-surface-variant font-label-sm text-label-sm mb-6">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">calendar_month</span> Dec 02</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">location_on</span> Paris</span>
+</div>
+<div class="flex justify-between items-center border-t border-white/5 pt-4">
+<div>
+<span class="font-label-sm text-[12px] text-on-surface-variant block">Starting from</span>
+<span class="font-title-md text-[18px] text-secondary">150 XLM</span>
+</div>
+<button class="bg-primary-container/20 text-primary hover:bg-primary-container hover:text-white px-4 py-2 rounded-full font-label-sm text-label-sm transition-colors">
+                                Buy Ticket
+                            </button>
+</div>
+</div>
+<div class="absolute inset-0 border-2 border-transparent group-hover:border-primary-container/50 rounded-3xl transition-colors duration-300 pointer-events-none"></div>
+</div>
+<!-- Event Card 3 -->
+<div class="group relative rounded-3xl overflow-hidden glass-panel transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_20px_40px_-10px_rgba(92,10,24,0.3)]">
+<div class="aspect-[4/3] relative w-full overflow-hidden">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" data-alt="A highly exclusive culinary dining experience in an architecturally stunning space. A long table is set with luxurious detail. The lighting is intimate and warm, casting soft shadows. The overall aesthetic is rich, dark, and sumptuous, utilizing deep maroons and soft ambient lighting." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAhAy-jUps4TyqWvebTqG1avJnGIa7qavNUV4tB0vFSMVG12Qk2aSndhqDZ-60PvVB0PqtIxlCSW4vWoBICT367eIMVDnjRDB8nWl6rTXHjVE3QcJoHpr3kT6gNRz8ivAZARfS_skoUIJZ5F9SoAfc8fKXha7GlEef5ccIlaPJLmMk6OycfBWQ-cDaA2eLAfsm-IxZvd6BUy19GVny8X41oy8OiNYyJwXnCSb0bcyALbmpD0kyKYyjRwXHJd-HuGUMS-e1wNgHCketa')"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-highest via-surface-container-highest/50 to-transparent"></div>
+<div class="absolute top-4 left-4 bg-surface-container-highest/80 backdrop-blur-md px-3 py-1 rounded-full">
+<span class="font-label-sm text-[12px] text-on-surface">Culinary</span>
+</div>
+</div>
+<div class="p-6 relative z-10 -mt-6">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-title-md text-title-md text-on-surface group-hover:text-primary transition-colors">Epicurean Nights</h3>
+</div>
+<div class="flex items-center gap-4 text-on-surface-variant font-label-sm text-label-sm mb-6">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">calendar_month</span> Jan 10</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">location_on</span> Tokyo</span>
+</div>
+<div class="flex justify-between items-center border-t border-white/5 pt-4">
+<div>
+<span class="font-label-sm text-[12px] text-on-surface-variant block">Starting from</span>
+<span class="font-title-md text-[18px] text-secondary">500 XLM</span>
+</div>
+<button class="bg-primary-container/20 text-primary hover:bg-primary-container hover:text-white px-4 py-2 rounded-full font-label-sm text-label-sm transition-colors">
+                                Buy Ticket
+                            </button>
+</div>
+</div>
+<div class="absolute inset-0 border-2 border-transparent group-hover:border-primary-container/50 rounded-3xl transition-colors duration-300 pointer-events-none"></div>
+</div>
+</div>
+<div class="mt-8 text-center md:hidden">
+<button class="text-primary hover:text-secondary transition-colors font-label-sm text-label-sm">
+                    View All Events
+                </button>
+</div>
+</section>
+</main>
+<!-- Footer (Shared Component) -->
+<footer class="bg-surface-container-lowest relative w-full border-t border-outline-variant flat">
+<div class="grid grid-cols-2 md:grid-cols-4 gap-gutter px-margin-mobile md:px-margin-desktop py-stack-lg max-w-container-max mx-auto">
+<div class="col-span-2 md:col-span-1 mb-6 md:mb-0">
+<div class="font-headline-lg-mobile text-headline-lg-mobile text-primary mb-4">TicketChain</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-6">The future of secure, transparent, and premium event ticketing on the blockchain.</p>
+<div class="flex gap-4 text-on-surface-variant">
+<span class="material-symbols-outlined hover:text-secondary transition-colors cursor-pointer">public</span>
+<span class="material-symbols-outlined hover:text-secondary transition-colors cursor-pointer">share</span>
+</div>
+</div>
+<div class="flex flex-col gap-3">
+<h4 class="font-label-sm text-label-sm text-on-surface mb-2">Platform</h4>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary transition-colors" href="#">Product</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary transition-colors" href="#">Features</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary transition-colors" href="#">Security</a>
+</div>
+<div class="flex flex-col gap-3">
+<h4 class="font-label-sm text-label-sm text-on-surface mb-2">Company</h4>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary transition-colors" href="#">About</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary transition-colors" href="#">Press</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary transition-colors" href="#">Company</a>
+</div>
+<div class="flex flex-col gap-3">
+<h4 class="font-label-sm text-label-sm text-on-surface mb-2">Legal</h4>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary transition-colors" href="#">Privacy</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary transition-colors" href="#">Terms of Service</a>
+</div>
+</div>
+<div class="border-t border-white/5 py-6 text-center">
+<p class="font-body-md text-body-md text-on-surface-variant">© 2024 TicketChain. Built on Stellar.</p>
+</div>
+</footer>
+</body></html>
