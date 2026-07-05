@@ -2,10 +2,11 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTickets, useEvents } from '../hooks/useTickets';
 import { useTicketStore } from '../store/useTicketStore';
+import { connectStellarWallet } from '../services/stellar';
 
 export const UserDashboardPage: React.FC = () => {
   const navigate = useNavigate();
-  const { walletAddress, walletConnected, tokenBalance, activities } = useTicketStore();
+  const { walletAddress, walletConnected, tokenBalance, activities, networkMode } = useTicketStore();
   const { data: tickets, isLoading: ticketsLoading } = useTickets(walletAddress);
   const { data: events } = useEvents();
 
@@ -43,6 +44,12 @@ export const UserDashboardPage: React.FC = () => {
           <span className="material-symbols-outlined text-[64px] text-primary mb-4">account_balance_wallet</span>
           <h3 className="font-title-md text-title-md text-on-surface">Connect Wallet</h3>
           <p className="text-on-surface-variant mt-2 mb-6">Connect your Stellar wallet to view your personal dashboard and tickets.</p>
+          <button 
+            onClick={() => connectStellarWallet(networkMode)}
+            className="btn-primary-gradient px-8 py-3 rounded-full font-label-sm text-label-sm text-white cursor-pointer shadow-lg active:scale-95 transition-transform"
+          >
+            Connect Wallet
+          </button>
         </div>
       ) : (
         <div className="space-y-stack-md">

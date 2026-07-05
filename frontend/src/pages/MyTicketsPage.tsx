@@ -2,10 +2,11 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTickets, useEvents } from '../hooks/useTickets';
 import { useTicketStore } from '../store/useTicketStore';
+import { connectStellarWallet } from '../services/stellar';
 
 export const MyTicketsPage: React.FC = () => {
   const navigate = useNavigate();
-  const { walletAddress, walletConnected } = useTicketStore();
+  const { walletAddress, walletConnected, networkMode } = useTicketStore();
   const { data: tickets, isLoading } = useTickets(walletAddress);
   const { data: events } = useEvents();
 
@@ -44,6 +45,12 @@ export const MyTicketsPage: React.FC = () => {
           <span className="material-symbols-outlined text-[64px] text-primary mb-4">account_balance_wallet</span>
           <h3 className="font-title-md text-title-md text-on-surface">Connect Wallet</h3>
           <p className="text-on-surface-variant mt-2 mb-6">Connect your wallet to retrieve your tickets from the ledger.</p>
+          <button 
+            onClick={() => connectStellarWallet(networkMode)}
+            className="btn-primary-gradient px-8 py-3 rounded-full font-label-sm text-label-sm text-white cursor-pointer shadow-lg active:scale-95 transition-transform"
+          >
+            Connect Wallet
+          </button>
         </div>
       ) : isLoading ? (
         <div className="flex justify-center items-center py-20">

@@ -15,6 +15,7 @@ import {
   Networks as WalletNetworks,
 } from '@creit.tech/stellar-wallets-kit';
 import { defaultModules } from '@creit.tech/stellar-wallets-kit/modules/utils';
+import { useTicketStore } from '../store/useTicketStore';
 
 // Testnet configurations
 export const TESTNET_RPC_URL = 'https://soroban-testnet.stellar.org';
@@ -254,16 +255,67 @@ export class StellarService {
 }
 
 export const streamLedgerEvents = (contractId: string, onEvent: (event: any) => void) => {
-  return (horizonServer as any).events()
-    .forTarget(contractId)
-    .cursor('now')
-    .stream({
-      onmessage: (event: any) => {
-        onEvent(event);
-      },
-      onerror: (error: any) => {
-        console.error('Event stream error:', error);
+  let isClosed = false;
+  let lastLedger: number | null = null;
+
+  const poll = async () => {
+    if (isClosed) return;
+    try {
+      if (lastLedger === null) {
+        const latest = await rpcServer.getLatestLedger();
+        lastLedger = latest.sequence;
+      } else {
+        const latest = await rpcServer.getLatestLedger();
+        if (latest.sequence > lastLedger) {
+          const eventsResponse = await rpcServer.getEvents({
+            startLedger: lastLedger + 1,
+            filters: [
+              {
+                type: 'contract',
+                contractIds: [contractId],
+              },
+            ],
+          });
+          lastLedger = latest.sequence;
+          if (eventsResponse.events && eventsResponse.events.length > 0) {
+            eventsResponse.events.forEach((ev) => {
+              onEvent(ev);
+            });
+          }
+        }
       }
-    });
+    } catch (err) {
+      console.warn('Error polling Soroban events:', err);
+    }
+    if (!isClosed) {
+      setTimeout(poll, 10000); // Poll every 10 seconds
+    }
+  };
+
+  poll();
+
+  return () => {
+    isClosed = true;
+  };
+};
+
+export const connectStellarWallet = async (networkMode: 'simulator' | 'testnet'): Promise<void> => {
+  const store = useTicketStore.getState();
+  if (networkMode === 'simulator') {
+    // Simulator connection: mock address
+    const randomSimulatorAddress = 'GC' + Math.random().toString(36).substr(2, 9).toUpperCase() + 'SIMULATED';
+    store.connectWallet(randomSimulatorAddress, 'Freighter (Sim)');
+  } else {
+    try {
+      initWalletKit();
+      const { address } = await StellarWalletsKit.authModal();
+      if (address) {
+        store.connectWallet(address, 'Freighter');
+      }
+    } catch (error) {
+      console.error('Wallet connection failed:', error);
+      alert('Could not connect wallet. Make sure Freighter is installed and unlocked.');
+    }
+  }
 };
 

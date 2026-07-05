@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useTicketStore } from '../store/useTicketStore';
-import { StellarWalletsKit } from '@creit.tech/stellar-wallets-kit';
-import { initWalletKit } from '../services/stellar';
+import { connectStellarWallet } from '../services/stellar';
 
 export const Navbar: React.FC = () => {
   const location = useLocation();
@@ -12,7 +11,6 @@ export const Navbar: React.FC = () => {
     walletConnected, 
     networkMode, 
     tokenBalance, 
-    connectWallet, 
     disconnectWallet, 
     setNetworkMode 
   } = useTicketStore();
@@ -21,22 +19,7 @@ export const Navbar: React.FC = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const handleConnect = async () => {
-    if (networkMode === 'simulator') {
-      // Simulator connection: mock address
-      const randomSimulatorAddress = 'GC' + Math.random().toString(36).substr(2, 9).toUpperCase() + 'SIMULATED';
-      connectWallet(randomSimulatorAddress, 'Freighter (Sim)');
-    } else {
-      try {
-        initWalletKit();
-        const { address } = await StellarWalletsKit.authModal();
-        if (address) {
-          connectWallet(address, 'Freighter');
-        }
-      } catch (error) {
-        console.error('Wallet connection failed:', error);
-        alert('Could not connect wallet. Make sure Freighter is installed and unlocked.');
-      }
-    }
+    await connectStellarWallet(networkMode);
   };
 
   const isActive = (path: string) => {
