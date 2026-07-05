@@ -1,0 +1,14 @@
+[workspace]
+resolver = "2"
+members = [
+    "ticket_manager",
+    "ticket_escrow"
+]
+
+[profile.release]
+opt-level = "z"
+overflow-checks = true
+debug = false
+codegen-units = 1
+panic = "abort"
+lto = true
