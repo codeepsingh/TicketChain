@@ -1,0 +1,269 @@
+import {
+  rpc,
+  Horizon,
+  Contract,
+  Address,
+  xdr,
+  TransactionBuilder,
+  Networks as StellarNetworks,
+  BASE_FEE,
+  Transaction,
+  nativeToScVal,
+} from '@stellar/stellar-sdk';
+import {
+  StellarWalletsKit,
+  Networks as WalletNetworks,
+} from '@creit.tech/stellar-wallets-kit';
+import { defaultModules } from '@creit.tech/stellar-wallets-kit/modules/utils';
+
+// Testnet configurations
+export const TESTNET_RPC_URL = 'https://soroban-testnet.stellar.org';
+export const TESTNET_HORIZON_URL = 'https://horizon-testnet.stellar.org';
+
+export const rpcServer = new rpc.Server(TESTNET_RPC_URL);
+export const horizonServer = new Horizon.Server(TESTNET_HORIZON_URL);
+
+let walletKitInitialized = false;
+
+export const initWalletKit = (): void => {
+  if (typeof window === 'undefined') return;
+  if (!walletKitInitialized) {
+    StellarWalletsKit.init({
+      network: WalletNetworks.TESTNET,
+      modules: defaultModules(),
+    });
+    walletKitInitialized = true;
+  }
+};
+
+export class StellarService {
+  /**
+   * Fetch XLM native balance of an account
+   */
+  static async getAccountBalance(address: string): Promise<number> {
+    try {
+      const account = await horizonServer.loadAccount(address);
+      const balanceObj = account.balances.find((b) => b.asset_type === 'native');
+      return balanceObj ? parseFloat(balanceObj.balance) : 0;
+    } catch (error) {
+      console.error('Error fetching horizon account balance:', error);
+      return 0;
+    }
+  }
+
+  /**
+   * Create an event on-chain
+   */
+  static async createEvent(
+    contractId: string,
+    signerAddress: string,
+    name: string,
+    ticketPrice: number,
+    maxTickets: number,
+    date: number
+  ): Promise<string> {
+    const params = [
+      Address.fromString(signerAddress).toScVal(),
+      nativeToScVal(name, { type: 'string' }),
+      nativeToScVal(BigInt(ticketPrice * 10_000_000), { type: 'i128' }), // Convert to 7 decimal stroke
+      nativeToScVal(maxTickets, { type: 'u32' }),
+      nativeToScVal(BigInt(date), { type: 'u64' }),
+    ];
+
+    return this.invokeContract(contractId, signerAddress, 'create_event', params);
+  }
+
+  /**
+   * Purchase a ticket on-chain
+   */
+  static async purchaseTicket(
+    contractId: string,
+    signerAddress: string,
+    eventId: number,
+    quantity: number
+  ): Promise<string> {
+    const params = [
+      Address.fromString(signerAddress).toScVal(),
+      nativeToScVal(BigInt(eventId), { type: 'u64' }),
+      nativeToScVal(quantity, { type: 'u32' }),
+    ];
+
+    return this.invokeContract(contractId, signerAddress, 'purchase_ticket', params);
+  }
+
+  /**
+   * Transfer a ticket on-chain
+   */
+  static async transferTicket(
+    contractId: string,
+    signerAddress: string,
+    ticketId: number,
+    toAddress: string
+  ): Promise<string> {
+    const params = [
+      nativeToScVal(BigInt(ticketId), { type: 'u64' }),
+      Address.fromString(signerAddress).toScVal(),
+      Address.fromString(toAddress).toScVal(),
+    ];
+
+    return this.invokeContract(contractId, signerAddress, 'transfer_ticket', params);
+  }
+
+  /**
+   * Verify ticket (gate scan) on-chain
+   */
+  static async verifyTicket(
+    contractId: string,
+    signerAddress: string,
+    ticketId: number
+  ): Promise<string> {
+    const params = [
+      nativeToScVal(BigInt(ticketId), { type: 'u64' }),
+      Address.fromString(signerAddress).toScVal(),
+    ];
+
+    return this.invokeContract(contractId, signerAddress, 'verify_ticket', params);
+  }
+
+  /**
+   * Cancel event on-chain
+   */
+  static async cancelEvent(
+    contractId: string,
+    signerAddress: string,
+    eventId: number
+  ): Promise<string> {
+    const params = [
+      nativeToScVal(BigInt(eventId), { type: 'u64' }),
+      Address.fromString(signerAddress).toScVal(),
+    ];
+
+    return this.invokeContract(contractId, signerAddress, 'cancel_event', params);
+  }
+
+  /**
+   * Complete event on-chain (release payout)
+   */
+  static async completeEvent(
+    contractId: string,
+    signerAddress: string,
+    eventId: number
+  ): Promise<string> {
+    const params = [
+      nativeToScVal(BigInt(eventId), { type: 'u64' }),
+      Address.fromString(signerAddress).toScVal(),
+    ];
+
+    return this.invokeContract(contractId, signerAddress, 'complete_event', params);
+  }
+
+  /**
+   * Claim ticket refund on-chain
+   */
+  static async claimRefund(
+    contractId: string,
+    signerAddress: string,
+    eventId: number,
+    ticketId: number
+  ): Promise<string> {
+    const params = [
+      nativeToScVal(BigInt(eventId), { type: 'u64' }),
+      nativeToScVal(BigInt(ticketId), { type: 'u64' }),
+      Address.fromString(signerAddress).toScVal(),
+    ];
+
+    return this.invokeContract(contractId, signerAddress, 'claim_refund', params);
+  }
+
+  /**
+   * Helper method to invoke a mutating contract call (build, simulate/preflight, wallet sign, and submit)
+   */
+  private static async invokeContract(
+    contractId: string,
+    signerAddress: string,
+    method: string,
+    params: xdr.ScVal[]
+  ): Promise<string> {
+    initWalletKit();
+    const contract = new Contract(contractId);
+
+    // 1. Fetch account information from Horizon
+    const account = await horizonServer.loadAccount(signerAddress);
+
+    // 2. Build the initial transaction
+    const tx = new TransactionBuilder(account, {
+      fee: BASE_FEE,
+      networkPassphrase: StellarNetworks.TESTNET,
+    })
+      .addOperation(contract.call(method, ...params))
+      .setTimeout(30)
+      .build();
+
+    // 3. Simulate (preflight) the transaction using Soroban RPC to fetch footprint + transaction resource adjustments
+    const simulation = await rpcServer.simulateTransaction(tx);
+    if (rpc.Api.isSimulationError(simulation)) {
+      throw new Error(`Simulation failed: ${simulation.error}`);
+    }
+
+    // 4. Assemble the transaction with resources and simulated fees
+    const assembledTx = rpc.assembleTransaction(tx, simulation) as any as Transaction;
+
+    // 5. Retrieve base64 transaction XDR to sign
+    const txXdr = assembledTx.toXDR();
+
+    // 6. Sign using StellarWalletsKit
+    const { signedTxXdr } = await StellarWalletsKit.signTransaction(txXdr, {
+      address: signerAddress,
+      networkPassphrase: StellarNetworks.TESTNET,
+    });
+
+    // 7. Re-wrap the signed transaction XDR
+    const signedTx = new Transaction(signedTxXdr, StellarNetworks.TESTNET);
+
+    // 8. Submit to the Soroban RPC server
+    const submission = await rpcServer.sendTransaction(signedTx);
+    if (submission.status === 'ERROR') {
+      throw new Error(`Transaction submission error: ${JSON.stringify(submission.errorResult)}`);
+    }
+
+    // 9. Poll for transaction status until confirmed/failed
+    const txHash = submission.hash;
+    let status = submission.status as string;
+    let attempts = 0;
+    
+    while (status === 'PENDING' && attempts < 10) {
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      const statusCheck = await rpcServer.getTransaction(txHash);
+      status = statusCheck.status as string;
+      
+      if (status === 'SUCCESS') {
+        return txHash;
+      }
+      if (status === 'FAILED') {
+        throw new Error(`Transaction ${txHash} failed on-chain.`);
+      }
+      attempts++;
+    }
+
+    if (status === 'PENDING') {
+      throw new Error(`Transaction ${txHash} timed out (still pending).`);
+    }
+
+    return txHash;
+  }
+}
+
+export const streamLedgerEvents = (contractId: string, onEvent: (event: any) => void) => {
+  return (horizonServer as any).events()
+    .forTarget(contractId)
+    .cursor('now')
+    .stream({
+      onmessage: (event: any) => {
+        onEvent(event);
+      },
+      onerror: (error: any) => {
+        console.error('Event stream error:', error);
+      }
+    });
+};
+
