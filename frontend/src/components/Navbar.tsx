@@ -56,13 +56,13 @@ export const Navbar: React.FC = () => {
 
   return (
     <nav className="fixed top-0 w-full z-50 bg-surface/10 backdrop-blur-xl border-b border-white/5 shadow-[0_8px_32px_0_rgba(92,10,24,0.15)]">
-      <div className="flex justify-between items-center px-margin-mobile md:px-margin-desktop py-4 max-w-container-max mx-auto">
+      <div className="flex justify-between items-center px-margin-mobile lg:px-margin-desktop py-4 max-w-container-max mx-auto">
         <Link to="/" className="flex items-center gap-2">
           <span className="font-headline-lg-mobile text-headline-lg-mobile font-bold tracking-tight text-on-surface">TicketChain</span>
         </Link>
 
         {/* Desktop Navigation Links matching Stitch exactly */}
-        <div className="hidden md:flex items-center gap-8">
+        <div className="hidden lg:flex items-center gap-6 xl:gap-8">
           <Link className={linkClass("/events")} to="/events">Events</Link>
           <a className="text-on-surface-variant font-medium hover:text-primary transition-colors duration-300 font-body-lg text-body-lg cursor-pointer" onClick={() => navigate('/')}>How It Works</a>
           <Link className={linkClass("/dashboard/organizer")} to="/dashboard/organizer">For Organizers</Link>
@@ -71,7 +71,7 @@ export const Navbar: React.FC = () => {
         </div>
 
         {/* Right side connection info */}
-        <div className="hidden md:flex items-center gap-4">
+        <div className="hidden lg:flex items-center gap-4">
           {/* Network Switcher Toggle */}
           <div className="flex items-center bg-surface-container-high rounded-full p-1 border border-white/5">
             <button 
@@ -137,7 +137,7 @@ export const Navbar: React.FC = () => {
         {/* Mobile Menu Toggle */}
         <button 
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="md:hidden text-on-surface p-2"
+          className="lg:hidden text-on-surface p-2"
         >
           <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 0" }}>
             {mobileMenuOpen ? 'close' : 'menu'}
@@ -147,7 +147,7 @@ export const Navbar: React.FC = () => {
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-surface-container border-b border-outline-variant/20 p-6 flex flex-col gap-4 animate-[slideDown_0.3s_ease-out]">
+        <div className="lg:hidden bg-surface-container border-b border-outline-variant/20 p-6 flex flex-col gap-4 animate-[slideDown_0.3s_ease-out]">
           <Link onClick={() => setMobileMenuOpen(false)} className="text-on-surface font-medium py-2 border-b border-white/5" to="/events">Events</Link>
           <a onClick={() => { setMobileMenuOpen(false); navigate('/'); }} className="text-on-surface font-medium py-2 border-b border-white/5 cursor-pointer">How It Works</a>
           <Link onClick={() => setMobileMenuOpen(false)} className="text-on-surface font-medium py-2 border-b border-white/5" to="/dashboard/organizer">For Organizers</Link>
