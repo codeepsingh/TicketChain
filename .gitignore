@@ -1,0 +1,29 @@
+# Rust / Soroban contract builds
+target/
+**/target/
+
+# Node packages and builds
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+.next/
+**/.next/
+out/
+**/out/
+
+# Environment configurations
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env*.local
+
+# System/IDE configs
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+.gemini/
+.git/
