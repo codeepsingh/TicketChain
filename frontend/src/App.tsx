@@ -37,7 +37,8 @@ const App: React.FC = () => {
     addActivity, 
     walletAddress, 
     walletConnected, 
-    updateTokenBalance 
+    updateTokenBalance,
+    purgeInvalidEvents,
   } = useTicketStore();
 
   useEffect(() => {
@@ -51,7 +52,10 @@ const App: React.FC = () => {
       console.log('Sanitizing invalid persisted contract IDs from local storage...');
       setContractIds(defaultManager, defaultEscrow);
     }
-  }, [managerContractId, escrowContractId, setContractIds]);
+
+    // Purge any events persisted with ID 0 (corrupted from a failed on-chain create_event decode)
+    purgeInvalidEvents();
+  }, [managerContractId, escrowContractId, setContractIds, purgeInvalidEvents]);
 
   useEffect(() => {
     if (networkMode !== 'testnet') return;

@@ -77,6 +77,7 @@ interface TicketStore {
   simCancelEvent: (eventId: number) => void;
   simCompleteEvent: (eventId: number) => void;
   simClaimRefund: (eventId: number, ticketId: number) => void;
+  purgeInvalidEvents: () => void;
 }
 
 // Initial default events for the simulator to make the app look alive immediately
@@ -212,6 +213,12 @@ export const useTicketStore = create<TicketStore>()(
       setNetworkMode: (mode) => set({ networkMode: mode }),
       setContractIds: (managerId, escrowId) => set({ managerContractId: managerId, escrowContractId: escrowId }),
       updateTokenBalance: (balance) => set({ tokenBalance: balance }),
+
+      purgeInvalidEvents: () => {
+        set((state) => ({
+          events: state.events.filter((e) => e.id > 0),
+        }));
+      },
 
       addTransaction: (tx) => {
         const newTx: TransactionStatus = {

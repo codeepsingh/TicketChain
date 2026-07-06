@@ -68,6 +68,9 @@ export class StellarService {
         console.error('Error decoding eventId from returnValue:', err);
       }
     }
+    if (!eventId || eventId <= 0) {
+      throw new Error('Contract did not return a valid event ID. The event may not have been created on-chain correctly.');
+    }
     return { txHash, eventId };
   }
 
@@ -208,6 +211,9 @@ export class StellarService {
       throw new Error(`Simulation failed: ${simulation.error}`);
     }
 
+    // Extract the preflight return value — this is the authoritative return val for read-equivalent calls like create_event
+    const preflightReturnValue = (simulation as rpc.Api.SimulateTransactionSuccessResponse).result?.retval;
+
     // 4. Assemble the transaction with resources and simulated fees
     const assembledTx = rpc.assembleTransaction(tx, simulation).build();
 
@@ -248,9 +254,12 @@ export class StellarService {
       status = statusCheck.status as string;
       
       if (status === 'SUCCESS') {
+        // Extract the on-chain confirmed return value from the result XDR
+        const successResponse = statusCheck as rpc.Api.GetSuccessfulTransactionResponse;
+        const onChainReturnValue = successResponse.returnValue ?? preflightReturnValue;
         return {
           txHash,
-          returnValue: (statusCheck as any).returnValue,
+          returnValue: onChainReturnValue,
         };
       }
       if (status === 'FAILED') {
@@ -263,7 +272,8 @@ export class StellarService {
       throw new Error(`Transaction ${txHash} timed out (still pending).`);
     }
 
-    return { txHash };
+    // Return with preflight value if polling exhausted without a terminal status
+    return { txHash, returnValue: preflightReturnValue };
   }
 }
 
