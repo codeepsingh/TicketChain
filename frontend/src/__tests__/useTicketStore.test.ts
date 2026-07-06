@@ -39,7 +39,7 @@ describe('useTicketStore', () => {
     const updatedStore = useTicketStore.getState();
     expect(updatedStore.tokenBalance).toBe(950);
     
-    const userTickets = updatedStore.tickets.filter(t => t.owner === 'G_MOCK_ADDRESS');
+    const userTickets = updatedStore.simTickets.filter((t: any) => t.owner === 'G_MOCK_ADDRESS');
     expect(userTickets.length).toBeGreaterThanOrEqual(2);
   });
 });

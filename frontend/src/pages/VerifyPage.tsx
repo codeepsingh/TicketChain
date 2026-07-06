@@ -4,7 +4,8 @@ import { useVerifyTicket, useEvents } from '../hooks/useTickets';
 import { connectStellarWallet } from '../services/stellar';
 
 export const VerifyPage: React.FC = () => {
-  const { tickets, walletConnected, networkMode } = useTicketStore();
+  const { simTickets, testnetTickets, walletConnected, networkMode } = useTicketStore();
+  const tickets = networkMode === 'simulator' ? simTickets : testnetTickets;
   const { data: events } = useEvents();
   const verifyMutation = useVerifyTicket();
 

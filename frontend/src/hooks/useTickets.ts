@@ -2,40 +2,52 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTicketStore } from '../store/useTicketStore';
 import { StellarService } from '../services/stellar';
 
+// ─────────────────────────────────────────────
+// useEvents — returns ONLY the events for the
+// active network mode. Modes NEVER mix.
+// ─────────────────────────────────────────────
 export const useEvents = () => {
-  const { events, networkMode } = useTicketStore();
+  const { simEvents, testnetEvents, networkMode } = useTicketStore();
 
   return useQuery({
     queryKey: ['events', networkMode],
     queryFn: async () => {
       if (networkMode === 'simulator') {
-        return events;
+        return simEvents;
       }
-      return events.filter((e) => e.onChain === true);
+      return testnetEvents;
     },
-    initialData: networkMode === 'simulator' ? events : events.filter((e) => e.onChain === true),
+    initialData: networkMode === 'simulator' ? simEvents : testnetEvents,
+    // Refetch from store slice when store changes
+    staleTime: 0,
   });
 };
 
+// ─────────────────────────────────────────────
+// useTickets — returns ONLY the tickets for the
+// active network mode and current wallet.
+// ─────────────────────────────────────────────
 export const useTickets = (userAddress: string | null) => {
-  const { tickets, networkMode } = useTicketStore();
+  const { simTickets, testnetTickets, networkMode } = useTicketStore();
 
   return useQuery({
     queryKey: ['tickets', userAddress, networkMode],
     queryFn: async () => {
       if (!userAddress) return [];
-      
       if (networkMode === 'simulator') {
-        return tickets.filter((t) => t.owner === userAddress);
+        return simTickets.filter((t) => t.owner === userAddress);
       }
-      
-      return tickets.filter((t) => t.owner === userAddress);
+      return testnetTickets.filter((t) => t.owner === userAddress);
     },
     enabled: !!userAddress,
     initialData: [],
+    staleTime: 0,
   });
 };
 
+// ─────────────────────────────────────────────
+// useCreateEvent
+// ─────────────────────────────────────────────
 export const useCreateEvent = () => {
   const queryClient = useQueryClient();
   const store = useTicketStore();
@@ -43,31 +55,28 @@ export const useCreateEvent = () => {
   return useMutation({
     mutationFn: async (params: { name: string; price: number; maxTickets: number; date: number }) => {
       const txId = `tx_${Date.now()}`;
-      
+
       if (store.networkMode === 'simulator') {
-        store.addTransaction({
-          id: txId,
-          label: `Create Event: ${params.name}`,
-          status: 'pending',
-        });
-        
+        store.addTransaction({ id: txId, label: `Create Event: ${params.name}`, status: 'pending' });
+
         await new Promise((resolve) => setTimeout(resolve, 1500));
         store.updateTransaction(txId, 'processing');
         await new Promise((resolve) => setTimeout(resolve, 800));
 
         const eventId = store.simCreateEvent(params.name, params.price, params.maxTickets, params.date);
         store.updateTransaction(txId, 'confirmed', '0x_sim_hash_' + Math.random().toString(36).substr(2, 6));
-        
+
         return eventId;
       } else {
-        if (!store.walletAddress) throw new Error('Wallet not connected');
-        
+        // ── TESTNET PATH ──
+        if (!store.walletAddress) throw new Error('Wallet not connected. Please connect Freighter first.');
+
         store.addTransaction({
           id: txId,
           label: `Stellar Soroban: Create Event (${params.name})`,
           status: 'pending',
         });
-        
+
         try {
           store.updateTransaction(txId, 'processing');
           const { txHash, eventId } = await StellarService.createEvent(
@@ -78,10 +87,21 @@ export const useCreateEvent = () => {
             params.maxTickets,
             params.date
           );
-          
+
           store.updateTransaction(txId, 'confirmed', txHash);
-          store.simCreateEvent(params.name, params.price, params.maxTickets, params.date, eventId);
-          
+
+          // ── Store in TESTNET array only ──
+          store.addTestnetEvent({
+            id: eventId,
+            organizer: store.walletAddress,
+            name: params.name,
+            ticketPrice: params.price,
+            maxTickets: params.maxTickets,
+            soldTickets: 0,
+            date: params.date,
+            status: 0,
+          });
+
           return txHash;
         } catch (error: any) {
           store.updateTransaction(txId, 'failed');
@@ -95,6 +115,9 @@ export const useCreateEvent = () => {
   });
 };
 
+// ─────────────────────────────────────────────
+// usePurchaseTicket
+// ─────────────────────────────────────────────
 export const usePurchaseTicket = () => {
   const queryClient = useQueryClient();
   const store = useTicketStore();
@@ -102,39 +125,43 @@ export const usePurchaseTicket = () => {
   return useMutation({
     mutationFn: async (params: { eventId: number; quantity: number }) => {
       const txId = `tx_${Date.now()}`;
-      const event = store.events.find(e => e.id === params.eventId);
-      const label = event ? `Buy ${params.quantity}x Tickets for "${event.name}"` : 'Purchase Tickets';
-      
+
       if (store.networkMode === 'simulator') {
+        // ── SIMULATOR PATH — only uses simEvents ──
+        const event = store.simEvents.find((e) => e.id === params.eventId);
+        if (!event) throw new Error(`Simulator event #${params.eventId} not found.`);
+
         store.addTransaction({
           id: txId,
-          label,
+          label: `[Sim] Buy ${params.quantity}x Tickets for "${event.name}"`,
           status: 'pending',
         });
-        
+
         await new Promise((resolve) => setTimeout(resolve, 1500));
         store.updateTransaction(txId, 'processing');
         await new Promise((resolve) => setTimeout(resolve, 800));
 
         store.simPurchaseTicket(params.eventId, params.quantity);
         store.updateTransaction(txId, 'confirmed', '0x_sim_hash_' + Math.random().toString(36).substr(2, 6));
-        
+
         return true;
       } else {
-        if (!store.walletAddress) throw new Error('Wallet not connected');
-        
-        // Prevent purchasing mock/default events on Testnet
-        const targetEvent = store.events.find(e => e.id === params.eventId);
-        if (targetEvent && !targetEvent.onChain) {
-          throw new Error('Default simulator events do not exist on the Testnet contract. Please switch Network Mode to "Sim" to test with mock events, or "Create Event" on Testnet to buy live tickets!');
+        // ── TESTNET PATH — only uses testnetEvents ──
+        if (!store.walletAddress) throw new Error('Wallet not connected. Please connect Freighter first.');
+
+        const event = store.testnetEvents.find((e) => e.id === params.eventId);
+        if (!event) {
+          throw new Error(
+            `Event #${params.eventId} does not exist on Testnet. Only events created on-chain can be purchased. Please use "Create Event" to deploy a new event to the Stellar Testnet contract.`
+          );
         }
 
         store.addTransaction({
           id: txId,
-          label: `Stellar Soroban: Purchase Tickets`,
+          label: `Stellar Soroban: Buy ${params.quantity}x Tickets for "${event.name}"`,
           status: 'pending',
         });
-        
+
         try {
           store.updateTransaction(txId, 'processing');
           const txHash = await StellarService.purchaseTicket(
@@ -143,10 +170,26 @@ export const usePurchaseTicket = () => {
             params.eventId,
             params.quantity
           );
-          
+
           store.updateTransaction(txId, 'confirmed', txHash);
-          store.simPurchaseTicket(params.eventId, params.quantity);
-          
+
+          // Store purchased tickets in TESTNET array
+          const buyer = store.walletAddress;
+          const newTickets = Array.from({ length: params.quantity }, (_, i) => ({
+            id: Date.now() + i,
+            eventId: params.eventId,
+            owner: buyer,
+            originalBuyer: buyer,
+            verified: false,
+          }));
+          store.addTestnetTickets(newTickets);
+          store.updateTestnetEventSoldCount(params.eventId, params.quantity);
+
+          store.addActivity({
+            type: 'ticket_purchased',
+            details: `${buyer.slice(0, 8)}... purchased ${params.quantity} ticket(s) for "${event.name}" on Testnet`,
+          });
+
           return txHash;
         } catch (error) {
           store.updateTransaction(txId, 'failed');
@@ -161,6 +204,9 @@ export const usePurchaseTicket = () => {
   });
 };
 
+// ─────────────────────────────────────────────
+// useTransferTicket
+// ─────────────────────────────────────────────
 export const useTransferTicket = () => {
   const queryClient = useQueryClient();
   const store = useTicketStore();
@@ -168,31 +214,27 @@ export const useTransferTicket = () => {
   return useMutation({
     mutationFn: async (params: { ticketId: number; toAddress: string }) => {
       const txId = `tx_${Date.now()}`;
-      
+
       if (store.networkMode === 'simulator') {
-        store.addTransaction({
-          id: txId,
-          label: `Transfer Ticket #${params.ticketId}`,
-          status: 'pending',
-        });
-        
+        store.addTransaction({ id: txId, label: `[Sim] Transfer Ticket #${params.ticketId}`, status: 'pending' });
+
         await new Promise((resolve) => setTimeout(resolve, 1200));
         store.updateTransaction(txId, 'processing');
         await new Promise((resolve) => setTimeout(resolve, 500));
 
         store.simTransferTicket(params.ticketId, params.toAddress);
         store.updateTransaction(txId, 'confirmed', '0x_sim_hash_' + Math.random().toString(36).substr(2, 6));
-        
+
         return true;
       } else {
-        if (!store.walletAddress) throw new Error('Wallet not connected');
-        
+        if (!store.walletAddress) throw new Error('Wallet not connected. Please connect Freighter first.');
+
         store.addTransaction({
           id: txId,
           label: `Stellar Soroban: Transfer Ticket #${params.ticketId}`,
           status: 'pending',
         });
-        
+
         try {
           store.updateTransaction(txId, 'processing');
           const txHash = await StellarService.transferTicket(
@@ -201,10 +243,20 @@ export const useTransferTicket = () => {
             params.ticketId,
             params.toAddress
           );
-          
+
           store.updateTransaction(txId, 'confirmed', txHash);
-          store.simTransferTicket(params.ticketId, params.toAddress);
-          
+          // Update testnet ticket owner locally
+          store.addTestnetTickets(
+            store.testnetTickets
+              .filter((t) => t.id === params.ticketId)
+              .map((t) => ({ ...t, owner: params.toAddress }))
+          );
+
+          store.addActivity({
+            type: 'ticket_transferred',
+            details: `Ticket #${params.ticketId} transferred to ${params.toAddress.slice(0, 8)}... on Testnet`,
+          });
+
           return txHash;
         } catch (error) {
           store.updateTransaction(txId, 'failed');
@@ -218,6 +270,9 @@ export const useTransferTicket = () => {
   });
 };
 
+// ─────────────────────────────────────────────
+// useVerifyTicket
+// ─────────────────────────────────────────────
 export const useVerifyTicket = () => {
   const queryClient = useQueryClient();
   const store = useTicketStore();
@@ -225,31 +280,27 @@ export const useVerifyTicket = () => {
   return useMutation({
     mutationFn: async (params: { ticketId: number }) => {
       const txId = `tx_${Date.now()}`;
-      
+
       if (store.networkMode === 'simulator') {
-        store.addTransaction({
-          id: txId,
-          label: `Verify Ticket Gate Entry #${params.ticketId}`,
-          status: 'pending',
-        });
-        
+        store.addTransaction({ id: txId, label: `[Sim] Verify Ticket #${params.ticketId}`, status: 'pending' });
+
         await new Promise((resolve) => setTimeout(resolve, 1000));
         store.updateTransaction(txId, 'processing');
         await new Promise((resolve) => setTimeout(resolve, 500));
 
         store.simVerifyTicket(params.ticketId);
         store.updateTransaction(txId, 'confirmed', '0x_sim_hash_' + Math.random().toString(36).substr(2, 6));
-        
+
         return true;
       } else {
-        if (!store.walletAddress) throw new Error('Wallet not connected');
-        
+        if (!store.walletAddress) throw new Error('Wallet not connected. Please connect Freighter first.');
+
         store.addTransaction({
           id: txId,
-          label: `Stellar Soroban: Gate Verification Ticket #${params.ticketId}`,
+          label: `Stellar Soroban: Verify Ticket #${params.ticketId}`,
           status: 'pending',
         });
-        
+
         try {
           store.updateTransaction(txId, 'processing');
           const txHash = await StellarService.verifyTicket(
@@ -257,10 +308,15 @@ export const useVerifyTicket = () => {
             store.walletAddress,
             params.ticketId
           );
-          
+
           store.updateTransaction(txId, 'confirmed', txHash);
-          store.simVerifyTicket(params.ticketId);
-          
+          store.updateTestnetTicketVerified(params.ticketId);
+
+          store.addActivity({
+            type: 'ticket_verified',
+            details: `Ticket #${params.ticketId} verified on Testnet`,
+          });
+
           return txHash;
         } catch (error) {
           store.updateTransaction(txId, 'failed');
@@ -274,6 +330,9 @@ export const useVerifyTicket = () => {
   });
 };
 
+// ─────────────────────────────────────────────
+// useCancelEvent
+// ─────────────────────────────────────────────
 export const useCancelEvent = () => {
   const queryClient = useQueryClient();
   const store = useTicketStore();
@@ -281,31 +340,27 @@ export const useCancelEvent = () => {
   return useMutation({
     mutationFn: async (params: { eventId: number }) => {
       const txId = `tx_${Date.now()}`;
-      
+
       if (store.networkMode === 'simulator') {
-        store.addTransaction({
-          id: txId,
-          label: `Cancel Event ID ${params.eventId}`,
-          status: 'pending',
-        });
-        
-        await new Promise((resolve) => setTimeout(resolve, 1500));
+        store.addTransaction({ id: txId, label: `[Sim] Cancel Event #${params.eventId}`, status: 'pending' });
+
+        await new Promise((resolve) => setTimeout(resolve, 1000));
         store.updateTransaction(txId, 'processing');
-        await new Promise((resolve) => setTimeout(resolve, 800));
+        await new Promise((resolve) => setTimeout(resolve, 500));
 
         store.simCancelEvent(params.eventId);
         store.updateTransaction(txId, 'confirmed', '0x_sim_hash_' + Math.random().toString(36).substr(2, 6));
-        
+
         return true;
       } else {
-        if (!store.walletAddress) throw new Error('Wallet not connected');
-        
+        if (!store.walletAddress) throw new Error('Wallet not connected. Please connect Freighter first.');
+
         store.addTransaction({
           id: txId,
-          label: `Stellar Soroban: Cancel Event ID ${params.eventId}`,
+          label: `Stellar Soroban: Cancel Event #${params.eventId}`,
           status: 'pending',
         });
-        
+
         try {
           store.updateTransaction(txId, 'processing');
           const txHash = await StellarService.cancelEvent(
@@ -313,10 +368,13 @@ export const useCancelEvent = () => {
             store.walletAddress,
             params.eventId
           );
-          
+
           store.updateTransaction(txId, 'confirmed', txHash);
-          store.simCancelEvent(params.eventId);
-          
+          store.addActivity({
+            type: 'event_cancelled',
+            details: `Event #${params.eventId} cancelled on Testnet`,
+          });
+
           return txHash;
         } catch (error) {
           store.updateTransaction(txId, 'failed');
@@ -330,62 +388,9 @@ export const useCancelEvent = () => {
   });
 };
 
-export const useCompleteEvent = () => {
-  const queryClient = useQueryClient();
-  const store = useTicketStore();
-
-  return useMutation({
-    mutationFn: async (params: { eventId: number }) => {
-      const txId = `tx_${Date.now()}`;
-      
-      if (store.networkMode === 'simulator') {
-        store.addTransaction({
-          id: txId,
-          label: `Complete Event & Disburse Payouts (ID ${params.eventId})`,
-          status: 'pending',
-        });
-        
-        await new Promise((resolve) => setTimeout(resolve, 1500));
-        store.updateTransaction(txId, 'processing');
-        await new Promise((resolve) => setTimeout(resolve, 800));
-
-        store.simCompleteEvent(params.eventId);
-        store.updateTransaction(txId, 'confirmed', '0x_sim_hash_' + Math.random().toString(36).substr(2, 6));
-        
-        return true;
-      } else {
-        if (!store.walletAddress) throw new Error('Wallet not connected');
-        
-        store.addTransaction({
-          id: txId,
-          label: `Stellar Soroban: Disburse Event Payouts (ID ${params.eventId})`,
-          status: 'pending',
-        });
-        
-        try {
-          store.updateTransaction(txId, 'processing');
-          const txHash = await StellarService.completeEvent(
-            store.managerContractId,
-            store.walletAddress,
-            params.eventId
-          );
-          
-          store.updateTransaction(txId, 'confirmed', txHash);
-          store.simCompleteEvent(params.eventId);
-          
-          return txHash;
-        } catch (error) {
-          store.updateTransaction(txId, 'failed');
-          throw error;
-        }
-      }
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['events'] });
-    },
-  });
-};
-
+// ─────────────────────────────────────────────
+// useClaimRefund
+// ─────────────────────────────────────────────
 export const useClaimRefund = () => {
   const queryClient = useQueryClient();
   const store = useTicketStore();
@@ -393,31 +398,27 @@ export const useClaimRefund = () => {
   return useMutation({
     mutationFn: async (params: { eventId: number; ticketId: number }) => {
       const txId = `tx_${Date.now()}`;
-      
+
       if (store.networkMode === 'simulator') {
-        store.addTransaction({
-          id: txId,
-          label: `Claim Ticket Refund #${params.ticketId}`,
-          status: 'pending',
-        });
-        
-        await new Promise((resolve) => setTimeout(resolve, 1200));
+        store.addTransaction({ id: txId, label: `[Sim] Claim Refund for Ticket #${params.ticketId}`, status: 'pending' });
+
+        await new Promise((resolve) => setTimeout(resolve, 1000));
         store.updateTransaction(txId, 'processing');
         await new Promise((resolve) => setTimeout(resolve, 500));
 
         store.simClaimRefund(params.eventId, params.ticketId);
         store.updateTransaction(txId, 'confirmed', '0x_sim_hash_' + Math.random().toString(36).substr(2, 6));
-        
+
         return true;
       } else {
-        if (!store.walletAddress) throw new Error('Wallet not connected');
-        
+        if (!store.walletAddress) throw new Error('Wallet not connected. Please connect Freighter first.');
+
         store.addTransaction({
           id: txId,
-          label: `Stellar Soroban: Claim Ticket Refund #${params.ticketId}`,
+          label: `Stellar Soroban: Claim Refund for Ticket #${params.ticketId}`,
           status: 'pending',
         });
-        
+
         try {
           store.updateTransaction(txId, 'processing');
           const txHash = await StellarService.claimRefund(
@@ -426,10 +427,13 @@ export const useClaimRefund = () => {
             params.eventId,
             params.ticketId
           );
-          
+
           store.updateTransaction(txId, 'confirmed', txHash);
-          store.simClaimRefund(params.eventId, params.ticketId);
-          
+          store.addActivity({
+            type: 'funds_withdrawn',
+            details: `Refund claimed for Ticket #${params.ticketId} on Testnet`,
+          });
+
           return txHash;
         } catch (error) {
           store.updateTransaction(txId, 'failed');
@@ -439,6 +443,64 @@ export const useClaimRefund = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tickets'] });
+    },
+  });
+};
+
+// ─────────────────────────────────────────────
+// useCompleteEvent (Organizer Dashboard)
+// ─────────────────────────────────────────────
+export const useCompleteEvent = () => {
+  const queryClient = useQueryClient();
+  const store = useTicketStore();
+
+  return useMutation({
+    mutationFn: async (params: { eventId: number }) => {
+      const txId = `tx_${Date.now()}`;
+
+      if (store.networkMode === 'simulator') {
+        store.addTransaction({ id: txId, label: `[Sim] Complete Event #${params.eventId}`, status: 'pending' });
+
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        store.updateTransaction(txId, 'processing');
+        await new Promise((resolve) => setTimeout(resolve, 500));
+
+        store.simCompleteEvent(params.eventId);
+        store.updateTransaction(txId, 'confirmed', '0x_sim_hash_' + Math.random().toString(36).substr(2, 6));
+
+        return true;
+      } else {
+        if (!store.walletAddress) throw new Error('Wallet not connected. Please connect Freighter first.');
+
+        store.addTransaction({
+          id: txId,
+          label: `Stellar Soroban: Complete Event #${params.eventId}`,
+          status: 'pending',
+        });
+
+        try {
+          store.updateTransaction(txId, 'processing');
+          const txHash = await StellarService.completeEvent(
+            store.managerContractId,
+            store.walletAddress,
+            params.eventId
+          );
+
+          store.updateTransaction(txId, 'confirmed', txHash);
+          store.addActivity({
+            type: 'event_completed',
+            details: `Event #${params.eventId} completed on Testnet`,
+          });
+
+          return txHash;
+        } catch (error) {
+          store.updateTransaction(txId, 'failed');
+          throw error;
+        }
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['events'] });
     },
   });
 };

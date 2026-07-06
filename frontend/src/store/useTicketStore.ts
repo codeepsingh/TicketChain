@@ -5,12 +5,11 @@ export interface EventInfo {
   id: number;
   organizer: string;
   name: string;
-  ticketPrice: number; // in XLM/USDC token units
+  ticketPrice: number; // in XLM units
   maxTickets: number;
   soldTickets: number;
   date: number; // Unix timestamp
   status: 0 | 1 | 2; // 0: Open, 1: Cancelled, 2: Completed
-  onChain?: boolean;
 }
 
 export interface TicketInfo {
@@ -47,10 +46,14 @@ interface TicketStore {
   managerContractId: string;
   escrowContractId: string;
 
-  // Ledger Data
-  events: EventInfo[];
-  tickets: TicketInfo[];
-  verifiers: Record<number, string[]>; // eventId -> verifier addresses
+  // ── SIMULATOR DATA (never touches blockchain) ──
+  simEvents: EventInfo[];
+  simTickets: TicketInfo[];
+  simVerifiers: Record<number, string[]>;
+
+  // ── TESTNET DATA (only real on-chain data) ──
+  testnetEvents: EventInfo[];
+  testnetTickets: TicketInfo[];
 
   // Telemetry & Feed
   activities: LedgerActivity[];
@@ -62,13 +65,20 @@ interface TicketStore {
   setNetworkMode: (mode: 'simulator' | 'testnet') => void;
   setContractIds: (managerId: string, escrowId: string) => void;
   updateTokenBalance: (balance: number) => void;
-  
+
   // Transaction Logging
   addTransaction: (tx: Omit<TransactionStatus, 'timestamp'>) => void;
   updateTransaction: (id: string, status: TransactionStatus['status'], txHash?: string) => void;
   addActivity: (activity: Omit<LedgerActivity, 'id' | 'timestamp' | 'txHash'>) => void;
 
-  // Simulator Mutation Actions (Fallback for simulator mode)
+  // ── TESTNET MUTATIONS (on-chain data only) ──
+  addTestnetEvent: (event: EventInfo) => void;
+  addTestnetTickets: (tickets: TicketInfo[]) => void;
+  updateTestnetEventSoldCount: (eventId: number, quantity: number) => void;
+  updateTestnetTicketVerified: (ticketId: number) => void;
+  purgeInvalidTestnetEvents: () => void;
+
+  // ── SIMULATOR MUTATIONS (local memory only) ──
   simCreateEvent: (name: string, price: number, maxTickets: number, date: number, forcedId?: number) => number;
   simPurchaseTicket: (eventId: number, quantity: number) => void;
   simTransferTicket: (ticketId: number, toAddress: string) => void;
@@ -77,11 +87,10 @@ interface TicketStore {
   simCancelEvent: (eventId: number) => void;
   simCompleteEvent: (eventId: number) => void;
   simClaimRefund: (eventId: number, ticketId: number) => void;
-  purgeInvalidEvents: () => void;
 }
 
-// Initial default events for the simulator to make the app look alive immediately
-const defaultEvents: EventInfo[] = [
+// ── SIMULATOR SEED DATA (never shown in Testnet mode) ──
+const defaultSimEvents: EventInfo[] = [
   {
     id: 1,
     organizer: 'GDG6XORGANIZER...TESTNET',
@@ -89,7 +98,7 @@ const defaultEvents: EventInfo[] = [
     ticketPrice: 25,
     maxTickets: 100,
     soldTickets: 42,
-    date: Date.now() / 1000 + 86400 * 30, // 30 days from now
+    date: Math.floor(Date.now() / 1000) + 86400 * 30,
     status: 0,
   },
   {
@@ -98,8 +107,8 @@ const defaultEvents: EventInfo[] = [
     name: 'Soroban Smart Contract Beats & Bass',
     ticketPrice: 15,
     maxTickets: 50,
-    soldTickets: 50, // Sold out
-    date: Date.now() / 1000 + 86400 * 15, // 15 days from now
+    soldTickets: 50,
+    date: Math.floor(Date.now() / 1000) + 86400 * 15,
     status: 0,
   },
   {
@@ -109,82 +118,71 @@ const defaultEvents: EventInfo[] = [
     ticketPrice: 150,
     maxTickets: 15,
     soldTickets: 8,
-    date: Date.now() / 1000 + 86400 * 5, // 5 days from now
+    date: Math.floor(Date.now() / 1000) + 86400 * 5,
     status: 0,
-  }
+  },
 ];
 
 export const useTicketStore = create<TicketStore>()(
   persist(
     (set, get) => ({
+      // ── WALLET & CONFIG ──
       walletAddress: null,
       walletConnected: false,
       walletName: null,
-      networkMode: 'testnet',
-      tokenBalance: 0, // Initial balance starts at 0 for actual wallets
+      networkMode: 'testnet', // Always default to testnet
+      tokenBalance: 0,
       managerContractId: import.meta.env.VITE_TICKET_MANAGER_CONTRACT || 'CA5PG7SDYI7X6AJMRBX6DZL5LA4YT5I7WECPH347FDSSOBDU73GUZ76O',
       escrowContractId: import.meta.env.VITE_TICKET_ESCROW_CONTRACT || 'CCHIMKSGFIOLMENQCLWSADERPFKFSMTLOWTWUYARBE6J4FGS6BKSY3S3',
 
-
-      events: defaultEvents,
-      tickets: [],
-      verifiers: {
+      // ── SIMULATOR DATA ──
+      simEvents: defaultSimEvents,
+      simTickets: [],
+      simVerifiers: {
         1: ['GDG6XORGANIZER...TESTNET'],
         2: ['GABCONCERT...TESTNET'],
         3: ['GCELES...TESTNET'],
       },
+
+      // ── TESTNET DATA (empty until events are created on-chain) ──
+      testnetEvents: [],
+      testnetTickets: [],
+
       activities: [
         {
           id: 'act_1',
           timestamp: Date.now() - 3600000 * 4,
           type: 'event_created',
-          details: 'Event "Stellar Orange Belt Developer Summit 2026" created by GDG6XORGANIZER...',
-          txHash: '0x8fa3...d8ea'
+          details: 'TicketChain platform initialized on Stellar Testnet.',
+          txHash: '0x8fa3...d8ea',
         },
-        {
-          id: 'act_2',
-          timestamp: Date.now() - 3600000 * 2,
-          type: 'event_created',
-          details: 'Event "Soroban Smart Contract Beats & Bass" created by GABCONCERT...',
-          txHash: '0xa2b5...7f1c'
-        }
       ],
       transactions: [],
 
+      // ── WALLET ACTIONS ──
       connectWallet: (address, walletName) => {
-        // Initialize simulator tickets for this wallet so the dashboard starts with some data
-        const currentTickets = get().tickets;
-        let newTickets = [...currentTickets];
-        
-        // If in simulator mode and the user has no tickets yet, give them mock tickets for testing
-        if (get().networkMode === 'simulator' && currentTickets.filter(t => t.owner === address).length === 0) {
-          newTickets = [
-            ...currentTickets,
-            {
-              id: 101,
-              eventId: 1,
-              owner: address,
-              originalBuyer: address,
-              verified: false,
-            },
-            {
-              id: 102,
-              eventId: 3,
-              owner: address,
-              originalBuyer: address,
-              verified: true, // Scanned
-            }
+        const currentSimTickets = get().simTickets;
+
+        // Seed simulator tickets for this wallet if in simulator mode and no tickets exist yet
+        let newSimTickets = [...currentSimTickets];
+        if (
+          get().networkMode === 'simulator' &&
+          currentSimTickets.filter((t) => t.owner === address).length === 0
+        ) {
+          newSimTickets = [
+            ...currentSimTickets,
+            { id: 101, eventId: 1, owner: address, originalBuyer: address, verified: false },
+            { id: 102, eventId: 3, owner: address, originalBuyer: address, verified: true },
           ];
         }
 
         set({
           walletAddress: address,
           walletConnected: true,
-          walletName: walletName,
-          tickets: newTickets,
+          walletName,
+          simTickets: newSimTickets,
         });
 
-        // Add transaction log
         get().addTransaction({
           id: `tx_${Date.now()}`,
           label: `Connect ${walletName} Wallet`,
@@ -198,7 +196,7 @@ export const useTicketStore = create<TicketStore>()(
           walletConnected: false,
           walletName: null,
           tokenBalance: 0,
-          tickets: [],
+          testnetTickets: [],
           transactions: [],
           activities: [],
         });
@@ -214,19 +212,60 @@ export const useTicketStore = create<TicketStore>()(
       setContractIds: (managerId, escrowId) => set({ managerContractId: managerId, escrowContractId: escrowId }),
       updateTokenBalance: (balance) => set({ tokenBalance: balance }),
 
-      purgeInvalidEvents: () => {
+      // ── TESTNET MUTATIONS ──
+      addTestnetEvent: (event) => {
         set((state) => ({
-          events: state.events.filter((e) => e.id > 0),
+          testnetEvents: [...state.testnetEvents.filter((e) => e.id !== event.id), event],
+          activities: [
+            {
+              id: `act_${Date.now()}`,
+              timestamp: Date.now(),
+              type: 'event_created' as const,
+              details: `On-chain event "${event.name}" (ID: ${event.id}) created by ${event.organizer.slice(0, 8)}...`,
+              txHash: '0x_testnet_' + Math.random().toString(36).substr(2, 8),
+            },
+            ...state.activities,
+          ].slice(0, 30),
         }));
       },
 
+      addTestnetTickets: (tickets) => {
+        set((state) => ({
+          testnetTickets: [...state.testnetTickets, ...tickets],
+        }));
+      },
+
+      updateTestnetEventSoldCount: (eventId, quantity) => {
+        set((state) => ({
+          testnetEvents: state.testnetEvents.map((e) =>
+            e.id === eventId ? { ...e, soldTickets: e.soldTickets + quantity } : e
+          ),
+        }));
+      },
+
+      updateTestnetTicketVerified: (ticketId) => {
+        set((state) => ({
+          testnetTickets: state.testnetTickets.map((t) =>
+            t.id === ticketId ? { ...t, verified: true } : t
+          ),
+        }));
+      },
+
+      purgeInvalidTestnetEvents: () => {
+        set((state) => ({
+          testnetEvents: state.testnetEvents.filter((e) => e.id > 0),
+          testnetTickets: state.testnetTickets.filter((t) => t.eventId > 0 && t.id > 0),
+        }));
+      },
+
+      // ── TRANSACTION LOGGING ──
       addTransaction: (tx) => {
         const newTx: TransactionStatus = {
           ...tx,
           timestamp: Date.now(),
         };
         set((state) => ({
-          transactions: [newTx, ...state.transactions].slice(0, 20), // Keep last 20
+          transactions: [newTx, ...state.transactions].slice(0, 20),
         }));
       },
 
@@ -246,14 +285,14 @@ export const useTicketStore = create<TicketStore>()(
           txHash: '0x' + Math.random().toString(16).substr(2, 8) + '...' + Math.random().toString(16).substr(2, 8),
         };
         set((state) => ({
-          activities: [newActivity, ...state.activities].slice(0, 30), // Keep last 30
+          activities: [newActivity, ...state.activities].slice(0, 30),
         }));
       },
 
-      // Simulator mutations
+      // ── SIMULATOR MUTATIONS (local memory — never touches blockchain) ──
       simCreateEvent: (name, price, maxTickets, date, forcedId) => {
         const organizer = get().walletAddress || 'G_SIMULATED_USER...TESTNET';
-        const newId = forcedId !== undefined ? forcedId : get().events.length + 1;
+        const newId = forcedId !== undefined ? forcedId : get().simEvents.length + 1;
         const newEvent: EventInfo = {
           id: newId,
           organizer,
@@ -263,20 +302,19 @@ export const useTicketStore = create<TicketStore>()(
           soldTickets: 0,
           date,
           status: 0,
-          onChain: get().networkMode === 'testnet',
         };
 
         set((state) => ({
-          events: [...state.events, newEvent],
-          verifiers: {
-            ...state.verifiers,
-            [newId]: [organizer], // Organizer is verifier by default
+          simEvents: [...state.simEvents, newEvent],
+          simVerifiers: {
+            ...state.simVerifiers,
+            [newId]: [organizer],
           },
         }));
 
         get().addActivity({
           type: 'event_created',
-          details: `Event "${name}" (ID: ${newId}) created by ${organizer.slice(0, 8)}...`,
+          details: `[Sim] Event "${name}" (ID: ${newId}) created by ${organizer.slice(0, 8)}...`,
         });
 
         return newId;
@@ -284,7 +322,7 @@ export const useTicketStore = create<TicketStore>()(
 
       simPurchaseTicket: (eventId, quantity) => {
         const buyer = get().walletAddress || 'G_SIMULATED_USER...TESTNET';
-        const event = get().events.find((e) => e.id === eventId);
+        const event = get().simEvents.find((e) => e.id === eventId);
         if (!event) return;
 
         const totalCost = event.ticketPrice * quantity;
@@ -292,7 +330,7 @@ export const useTicketStore = create<TicketStore>()(
           throw new Error('Insufficient simulated balance');
         }
 
-        const currentCounter = get().tickets.length + 200; // Counter starts at 200 for simulated
+        const currentCounter = get().simTickets.length + 200;
         const newTickets: TicketInfo[] = [];
 
         for (let i = 0; i < quantity; i++) {
@@ -307,94 +345,87 @@ export const useTicketStore = create<TicketStore>()(
 
         set((state) => ({
           tokenBalance: state.tokenBalance - totalCost,
-          tickets: [...state.tickets, ...newTickets],
-          events: state.events.map((e) =>
+          simTickets: [...state.simTickets, ...newTickets],
+          simEvents: state.simEvents.map((e) =>
             e.id === eventId ? { ...e, soldTickets: e.soldTickets + quantity } : e
           ),
         }));
 
         get().addActivity({
           type: 'ticket_purchased',
-          details: `${buyer.slice(0, 8)}... purchased ${quantity} tickets for "${event.name}"`,
+          details: `[Sim] ${buyer.slice(0, 8)}... purchased ${quantity} tickets for "${event.name}"`,
         });
       },
 
       simTransferTicket: (ticketId, toAddress) => {
         const from = get().walletAddress || '';
-        const ticket = get().tickets.find((t) => t.id === ticketId);
-        if (!ticket) return;
-
         set((state) => ({
-          tickets: state.tickets.map((t) =>
+          simTickets: state.simTickets.map((t) =>
             t.id === ticketId ? { ...t, owner: toAddress } : t
           ),
         }));
 
         get().addActivity({
           type: 'ticket_transferred',
-          details: `Ticket #${ticketId} transferred from ${from.slice(0, 8)}... to ${toAddress.slice(0, 8)}...`,
+          details: `[Sim] Ticket #${ticketId} transferred from ${from.slice(0, 8)}... to ${toAddress.slice(0, 8)}...`,
         });
       },
 
       simVerifyTicket: (ticketId) => {
         const verifier = get().walletAddress || 'G_SIMULATED_VERIFIER';
-        const ticket = get().tickets.find((t) => t.id === ticketId);
-        if (!ticket) return;
-
         set((state) => ({
-          tickets: state.tickets.map((t) =>
+          simTickets: state.simTickets.map((t) =>
             t.id === ticketId ? { ...t, verified: true } : t
           ),
         }));
 
         get().addActivity({
           type: 'ticket_verified',
-          details: `Ticket #${ticketId} scanned and verified at the gate by verifier ${verifier.slice(0, 8)}...`,
+          details: `[Sim] Ticket #${ticketId} verified at gate by ${verifier.slice(0, 8)}...`,
         });
       },
 
       simAddVerifier: (eventId, verifier) => {
-        const currentVerifiers = get().verifiers[eventId] || [];
+        const currentVerifiers = get().simVerifiers[eventId] || [];
         if (currentVerifiers.includes(verifier)) return;
 
         set((state) => ({
-          verifiers: {
-            ...state.verifiers,
+          simVerifiers: {
+            ...state.simVerifiers,
             [eventId]: [...currentVerifiers, verifier],
           },
         }));
 
         get().addActivity({
-          type: 'event_created', // Just log as general log
-          details: `Address ${verifier.slice(0, 8)}... added as authorized verifier for Event ID ${eventId}`,
+          type: 'event_created',
+          details: `[Sim] Address ${verifier.slice(0, 8)}... added as verifier for Event ID ${eventId}`,
         });
       },
 
       simCancelEvent: (eventId) => {
-        const event = get().events.find((e) => e.id === eventId);
+        const event = get().simEvents.find((e) => e.id === eventId);
         if (!event) return;
 
         set((state) => ({
-          events: state.events.map((e) =>
+          simEvents: state.simEvents.map((e) =>
             e.id === eventId ? { ...e, status: 1 } : e
           ),
         }));
 
         get().addActivity({
           type: 'event_cancelled',
-          details: `Event "${event.name}" (ID: ${eventId}) cancelled by organizer. Refunds enabled!`,
+          details: `[Sim] Event "${event.name}" (ID: ${eventId}) cancelled. Refunds enabled!`,
         });
       },
 
       simCompleteEvent: (eventId) => {
         const organizer = get().walletAddress || '';
-        const event = get().events.find((e) => e.id === eventId);
+        const event = get().simEvents.find((e) => e.id === eventId);
         if (!event) return;
 
         const payout = event.ticketPrice * event.soldTickets;
-
         set((state) => ({
-          events: state.events.map((e) =>
+          simEvents: state.simEvents.map((e) =>
             e.id === eventId ? { ...e, status: 2 } : e
           ),
           tokenBalance: event.organizer === organizer ? state.tokenBalance + payout : state.tokenBalance,
@@ -402,41 +433,48 @@ export const useTicketStore = create<TicketStore>()(
 
         get().addActivity({
           type: 'event_completed',
-          details: `Event "${event.name}" marked complete. Released ${payout} tokens to organizer.`,
+          details: `[Sim] Event "${event.name}" completed. Released ${payout} XLM to organizer.`,
         });
       },
 
       simClaimRefund: (eventId, ticketId) => {
         const buyer = get().walletAddress || '';
-        const ticket = get().tickets.find((t) => t.id === ticketId);
-        const event = get().events.find((e) => e.id === eventId);
+        const ticket = get().simTickets.find((t) => t.id === ticketId);
+        const event = get().simEvents.find((e) => e.id === eventId);
         if (!ticket || !event) return;
-
-        // Verify ownership and event status
         if (ticket.owner !== buyer || event.status !== 1) return;
 
         set((state) => ({
           tokenBalance: state.tokenBalance + event.ticketPrice,
-          tickets: state.tickets.filter((t) => t.id !== ticketId),
+          simTickets: state.simTickets.filter((t) => t.id !== ticketId),
         }));
 
         get().addActivity({
           type: 'funds_withdrawn',
-          details: `Buyer ${buyer.slice(0, 8)}... claimed refund of ${event.ticketPrice} tokens for Ticket #${ticketId}`,
+          details: `[Sim] ${buyer.slice(0, 8)}... claimed refund of ${event.ticketPrice} XLM for Ticket #${ticketId}`,
         });
-      }
+      },
     }),
     {
-      name: 'ticketchain-storage',
+      name: 'ticketchain-storage-v2', // New storage key to avoid corrupted legacy data
       partialize: (state) => ({
-        events: state.events,
-        tickets: state.tickets,
-        verifiers: state.verifiers,
+        // Persist wallet state
+        walletAddress: state.walletAddress,
+        walletConnected: state.walletConnected,
+        walletName: state.walletName,
         tokenBalance: state.tokenBalance,
-        activities: state.activities,
+        // Persist contract config
         managerContractId: state.managerContractId,
         escrowContractId: state.escrowContractId,
         networkMode: state.networkMode,
+        // Persist separated event/ticket stores
+        simEvents: state.simEvents,
+        simTickets: state.simTickets,
+        simVerifiers: state.simVerifiers,
+        testnetEvents: state.testnetEvents,
+        testnetTickets: state.testnetTickets,
+        // Persist telemetry
+        activities: state.activities,
       }),
     }
   )

@@ -38,9 +38,11 @@ const App: React.FC = () => {
     walletAddress, 
     walletConnected, 
     updateTokenBalance,
-    purgeInvalidEvents,
+    purgeInvalidTestnetEvents,
+    setNetworkMode,
   } = useTicketStore();
 
+  // ── On mount: sanitize stored config & force testnet mode ──
   useEffect(() => {
     const defaultManager = import.meta.env.VITE_TICKET_MANAGER_CONTRACT || 'CA5PG7SDYI7X6AJMRBX6DZL5LA4YT5I7WECPH347FDSSOBDU73GUZ76O';
     const defaultEscrow = import.meta.env.VITE_TICKET_ESCROW_CONTRACT || 'CCHIMKSGFIOLMENQCLWSADERPFKFSMTLOWTWUYARBE6J4FGS6BKSY3S3';
@@ -49,13 +51,18 @@ const App: React.FC = () => {
       !managerContractId || managerContractId.length !== 56 || !managerContractId.startsWith('C') ||
       !escrowContractId || escrowContractId.length !== 56 || !escrowContractId.startsWith('C')
     ) {
-      console.log('Sanitizing invalid persisted contract IDs from local storage...');
+      console.log('[App] Sanitizing invalid persisted contract IDs...');
       setContractIds(defaultManager, defaultEscrow);
     }
 
-    // Purge any events persisted with ID 0 (corrupted from a failed on-chain create_event decode)
-    purgeInvalidEvents();
-  }, [managerContractId, escrowContractId, setContractIds, purgeInvalidEvents]);
+    // Always lock to testnet (sim toggle was removed from UI)
+    if (networkMode !== 'testnet') {
+      setNetworkMode('testnet');
+    }
+
+    // Remove any events stored with invalid IDs (e.g. from a failed create_event decode)
+    purgeInvalidTestnetEvents();
+  }, []);
 
   useEffect(() => {
     if (networkMode !== 'testnet') return;

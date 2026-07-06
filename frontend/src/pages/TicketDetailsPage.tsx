@@ -8,7 +8,8 @@ export const TicketDetailsPage: React.FC = () => {
   const navigate = useNavigate();
   const ticketIdNum = Number(id);
 
-  const { tickets, walletAddress } = useTicketStore();
+  const { simTickets, testnetTickets, walletAddress, networkMode } = useTicketStore();
+  const tickets = networkMode === 'simulator' ? simTickets : testnetTickets;
   const transferMutation = useTransferTicket();
   const refundMutation = useClaimRefund();
   
