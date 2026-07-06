@@ -1,59 +1,105 @@
-# TicketChain
+# TicketChain 🎟️
 
-[![Build Status](https://img.shields.io/github/actions/workflow/status/codeepsingh/TicketChain/ci-cd.yml?branch=main&style=for-the-badge&logo=github&label=Build)](https://github.com/codeepsingh/TicketChain/actions)
-[![Deployment Status](https://img.shields.io/badge/Netlify-Deployed-success?style=for-the-badge&color=25C2A0&logo=netlify)](https://ticketchain1.netlify.app/)
-[![Live Demo](https://img.shields.io/badge/Demo-Live-gold?style=for-the-badge&logo=stellar)](https://ticketchain1.netlify.app/)
-[![GitHub Stars](https://img.shields.io/github/stars/codeepsingh/TicketChain?style=for-the-badge&logo=github)](https://github.com/codeepsingh/TicketChain/stargazers)
-[![Latest Commit](https://img.shields.io/github/last-commit/codeepsingh/TicketChain?style=for-the-badge&logo=git)](https://github.com/codeepsingh/TicketChain/commits/main)
-[![License](https://img.shields.io/github/license/codeepsingh/TicketChain?style=for-the-badge&color=blue)](https://github.com/codeepsingh/TicketChain)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/codeepsingh/TicketChain/ci-cd.yml?branch=main&style=for-the-badge&logo=github&label=CI%2FCD)](https://github.com/codeepsingh/TicketChain/actions)
+[![Netlify](https://img.shields.io/badge/Netlify-Deployed-00C7B7?style=for-the-badge&logo=netlify)](https://ticketchain1.netlify.app/)
+[![Live Demo](https://img.shields.io/badge/Live_Demo-ticketchain1.netlify.app-gold?style=for-the-badge&logo=stellar)](https://ticketchain1.netlify.app/)
+[![Stellar Testnet](https://img.shields.io/badge/Stellar-Testnet-7B2FBE?style=for-the-badge&logo=stellar)](https://stellar.expert/explorer/testnet)
+[![License](https://img.shields.io/github/license/codeepsingh/TicketChain?style=for-the-badge&color=blue)](LICENSE)
+[![Last Commit](https://img.shields.io/github/last-commit/codeepsingh/TicketChain?style=for-the-badge&logo=git)](https://github.com/codeepsingh/TicketChain/commits/main)
 
-### Fraud-Proof Event Ticketing on Stellar
+> **Fraud-proof, decentralized event ticketing — powered by Soroban smart contracts on the Stellar network.**
 
-TicketChain is a decentralized ticket management platform built on the Stellar network using Soroban smart contracts. It guarantees secure, verifiable, and transferable event tickets, preventing double-spending and fraud at the gate.
+TicketChain eliminates ticket fraud, counterfeiting, and scalping by issuing every ticket as a cryptographically-verified on-chain token. Ownership is immutable, transfers are permissioned, and gate validation prevents double-entry — all enforced by smart contract logic with no central authority.
 
 ---
 
-## Project Description
+## Table of Contents
 
-TicketChain addresses the ticket scalping and counterfeiting issues prevalent in the modern live event industry. By issuing tickets as unique on-chain digital tokens and verifying entrance permissions in real-time on the ledger, TicketChain ensures that ticket ownership can be validated cryptographically. The application supports a dual mode: an offline in-memory **Simulator** for instant dry-runs, and a **Stellar Testnet** mode for wallet-signed on-chain execution.
+- [Problem Statement](#problem-statement)
+- [Why Stellar](#why-stellar)
+- [Live Demo](#live-demo)
+- [Architecture](#architecture)
+- [Transaction Flow](#transaction-flow)
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Smart Contracts](#smart-contracts)
+- [Wallet Integration](#wallet-integration)
+- [Project Structure](#project-structure)
+- [Getting Started](#getting-started)
+- [Environment Variables](#environment-variables)
+- [Running Tests](#running-tests)
+- [CI/CD Pipeline](#cicd-pipeline)
+- [Deployment](#deployment)
+- [Usage Guide](#usage-guide)
+- [Security](#security)
+- [Roadmap](#roadmap)
+- [Stellar Level Compliance](#stellar-level-compliance)
+- [Submission Details](#submission-details)
 
 ---
 
 ## Problem Statement
 
-Traditional ticketing systems suffer from:
+The global event ticketing market is valued at **$78B+**, yet suffers from systemic fraud:
 
-1. **Counterfeit Tickets**: PDF tickets and barcodes can easily be cloned and sold multiple times.
-2. **Exorbitant Scalper Fees**: Secondary ticket brokers mark up prices, with organizers losing out on fee splits.
-3. **Escrow Instability**: Unsecured custody of ticket funds can leave buyers stranded if organizers cancel.
+| Problem | Impact |
+|---|---|
+| **Counterfeit Tickets** | PDF/barcode tickets cloned and sold multiple times |
+| **Scalper Markups** | Secondary brokers inflate prices 2–10×; organizers lose fee revenue |
+| **Unprotected Funds** | No guaranteed escrow if events are cancelled — buyers left stranded |
+| **Double-Entry Fraud** | Physical tickets can be photographed and reused at gates |
+
+TicketChain solves all four at the protocol level using Soroban smart contracts.
 
 ---
 
 ## Why Stellar
 
-Stellar is selected due to:
-
-* **Soroban Smart Contracts**: Rust-based WASM contracts offer fast execution, predictable gas fees, and structured storage.
-* **Low Fees & Latency**: Sub-second finality with negligible fees allows for viable micro-ticketing applications.
-* **Stellar Asset Contract (SAC)**: Standardized payment tokens (e.g. native XLM) integrate seamlessly with custom escrow logic.
-* **Freighter Ecosystem**: Mature browser wallet with `@creit.tech/stellar-wallets-kit` multi-wallet support.
+| Capability | Benefit |
+|---|---|
+| **Soroban Smart Contracts** | Rust/WASM contracts with predictable fees and structured persistent storage |
+| **Sub-second Finality** | ~5s transaction confirmation — viable for live gate scanning |
+| **Low Transaction Fees** | Negligible fees enable micro-ticketing and high-volume purchases |
+| **Stellar Asset Contract (SAC)** | Native XLM and USDC integrate seamlessly with escrow logic |
+| **Freighter Ecosystem** | Mature browser wallet; multi-wallet support via `stellar-wallets-kit` |
 
 ---
 
-## Architecture Diagram
+## Live Demo
+
+🌐 **https://ticketchain1.netlify.app/**
+
+The app connects to **Stellar Testnet**. To interact:
+1. Install [Freighter Wallet](https://www.freighter.app/) and set it to **Testnet**
+2. Fund your testnet account at the [Stellar Faucet](https://laboratory.stellar.org/#account-creator?network=testnet)
+3. Connect wallet → Create Events → Buy Tickets → Scan Gate
+
+---
+
+## Architecture
 
 ```mermaid
 graph TD
-    Client[Web Client: React + StellarWalletsKit] -->|Sign & Submit Tx| StellarRPC[Stellar Testnet RPC]
-    Client -->|Query Account Details| Horizon[Horizon Ledger]
-    
-    subgraph Soroban Smart Contracts
-        TM[Ticket Manager Contract] <--->|C2C Calls: Escrow Funds / Refund| TE[Ticket Escrow Contract]
+    Client[React Frontend<br/>TypeScript + Vite + Zustand] -->|Sign & Submit Tx| RPC[Stellar Testnet RPC<br/>soroban-testnet.stellar.org]
+    Client -->|Query Balances| Horizon[Horizon API<br/>horizon-testnet.stellar.org]
+    Client -->|Poll Events| RPC
+
+    subgraph Soroban Contracts [Soroban Smart Contracts on Testnet]
+        TM[ticket_manager<br/>CA5PG7...Z76O]
+        TE[ticket_escrow<br/>CCHIMK...Y3S3]
+        TM <-->|C2C: deposit / release / refund| TE
     end
-    
-    StellarRPC -->|Execute Transaction| TM
-    TM -->|Emit Ledger Events| EventLog[(Stellar Ledger Events)]
-    EventLog -->|Poll via getEvents| Client
+
+    RPC -->|Execute Transaction| TM
+    TM -->|Emit Ledger Events| Events[(Stellar Ledger Events)]
+    Events -->|getEvents polling| Client
+```
+
+**Three-tier architecture:**
+
+```
+UI Layer         →   Hooks / React Query   →   Services / Stellar SDK   →   Soroban Contracts
+(10 Pages)           (useTickets.ts)            (stellar.ts)                  (Rust / WASM)
 ```
 
 ---
@@ -65,78 +111,123 @@ sequenceDiagram
     participant U as User (Browser)
     participant F as Freighter Wallet
     participant R as Soroban RPC
-    participant TM as Ticket Manager
-    participant TE as Ticket Escrow
+    participant TM as ticket_manager
+    participant TE as ticket_escrow
 
     U->>R: simulateTransaction (preflight)
-    R-->>U: footprint + resource fees
+    R-->>U: footprint + resource fee estimate
     U->>F: signTransaction (XDR payload)
     F-->>U: signedTxXdr
     U->>R: sendTransaction (signed envelope)
-    R->>TM: Execute create_event / purchase_ticket
-    TM->>TE: C2C: deposit_funds / release_payout
+    R->>TM: create_event / purchase_ticket / verify_ticket
+    TM->>TE: C2C → deposit_funds / release_payout / refund
     R-->>U: { hash, status: PENDING }
-    U->>R: getTransaction (polling, max 10 retries)
-    R-->>U: { status: SUCCESS, returnValue }
+    loop Poll (max 10 retries)
+        U->>R: getTransaction(hash)
+        R-->>U: { status: SUCCESS, returnValue }
+    end
 ```
 
 ---
 
 ## Features
 
-1. **On-Chain Event Creation**: Deploy new events directly to the Stellar Testnet via Soroban contract invocation.
-2. **Inter-Contract Financial Escrow**: Payouts are safely held by a custody contract (`TicketEscrow`) and only released to organizers when events complete, or refunded to buyers if cancelled.
-3. **Double-Spend Gate Scanning**: Prevents multiple entries by tracking entry scan status (`verified`) in the smart contract.
-4. **Holographic Ticket Pass**: Interactive mobile-ready ticket cards showing digital signatures, ticket numbers, and dynamic QR verification codes.
-5. **Organizer Dashboard**: Live financial tracking of ticket sales, capacity caps, and payout disbursement buttons.
-6. **Real-Time Transaction Feed**: Auto-dismissing status notifications for all on-chain interactions (pending → processing → confirmed).
-7. **Simulator Engine**: Full offline dry-run mode for testing without wallet or testnet access.
+| Feature | Description |
+|---|---|
+| 🎪 **On-Chain Event Creation** | Deploy events to Stellar Testnet via Soroban contract invocation |
+| 💰 **Inter-Contract Escrow** | Funds held by `ticket_escrow`; released on completion or refunded on cancellation |
+| 🔒 **Double-Spend Gate Protection** | `verified` flag in contract blocks re-entry at physical gates |
+| 🎫 **Holographic Ticket Pass** | 3D CSS-transformed ticket cards with QR codes and digital signatures |
+| 📊 **Organizer Dashboard** | Live financial tracking: ticket sales, capacity, escrow balance, payout actions |
+| 🔔 **Real-Time Transaction Feed** | Auto-dismissing toast notifications: `pending → processing → confirmed` |
+| 🔁 **Ticket Transfers** | Permissioned on-chain ownership transfer to any Stellar address |
+| 🧪 **Offline Simulator** | Full dry-run mode — no wallet or testnet needed for demos |
+| 📱 **Mobile Responsive** | Glassmorphism UI adapts from mobile to widescreen with hamburger nav |
+| 🔍 **Event Streaming** | Soroban `getEvents` polling surfaces ledger events in real time |
 
 ---
 
 ## Tech Stack
 
-* **Frontend**: React 19, TypeScript, Vite 8, Tailwind CSS v4, Zustand v5, React Query v5
-* **Smart Contracts**: Rust, Soroban SDK
-* **Blockchain Integrations**: `@stellar/stellar-sdk` v16, `@stellar/freighter-api` v6, `@creit.tech/stellar-wallets-kit` v2.5.0
-* **Testing**: Vitest (frontend), Cargo test (contracts)
-* **CI/CD**: GitHub Actions
-* **Hosting**: Netlify
+### Frontend
+| Technology | Version | Purpose |
+|---|---|---|
+| React | 19 | UI framework |
+| TypeScript | 5 | Type safety |
+| Vite | 6 | Build tool & dev server |
+| Tailwind CSS | v4 | Utility-first styling |
+| Zustand | v5 | Global state management |
+| React Query | v5 | Async data fetching & caching |
+
+### Blockchain
+| Package | Version | Purpose |
+|---|---|---|
+| `@stellar/stellar-sdk` | v16 | Soroban RPC, transaction building |
+| `@stellar/freighter-api` | v6 | Freighter wallet API |
+| `@creit.tech/stellar-wallets-kit` | v2.5 | Multi-wallet modal (Freighter, Albedo, Hana, LOBSTR) |
+
+### Contracts
+| Technology | Purpose |
+|---|---|
+| Rust | Smart contract language |
+| Soroban SDK | Contract macros, storage, events |
+| `wasm32-unknown-unknown` | Compilation target |
+
+### Infrastructure
+| Tool | Purpose |
+|---|---|
+| GitHub Actions | CI/CD — build, test, deploy |
+| Netlify | Frontend hosting (auto-deploy on push) |
+| Vitest | Frontend unit tests |
+| Cargo test | Rust contract unit tests |
 
 ---
 
 ## Smart Contracts
 
-### 1. Ticket Manager (`ticket_manager`)
+Both contracts are deployed and verified on **Stellar Testnet**.
 
-**Contract ID:** `CA5PG7SDYI7X6AJMRBX6DZL5LA4YT5I7WECPH347FDSSOBDU73GUZ76O`
+### Ticket Manager — `ticket_manager`
 
-Handles core ticketing business rules:
-* Creates events and sets price/capacity.
-* Mints ticket tokens and records ownership using **Persistent** storage.
-* Processes ticket transfers with ownership verification.
-* Authorizes event verifiers and validates tickets at entry with double-spend protection.
-* Coordinates completions and cancellations via C2C calls to the escrow contract.
+**Contract ID:** [`CA5PG7SDYI7X6AJMRBX6DZL5LA4YT5I7WECPH347FDSSOBDU73GUZ76O`](https://stellar.expert/explorer/testnet/contract/CA5PG7SDYI7X6AJMRBX6DZL5LA4YT5I7WECPH347FDSSOBDU73GUZ76O)
 
-### 2. Ticket Escrow (`ticket_escrow`)
+The core business logic contract. Handles all ticketing operations:
 
-**Contract ID:** `CCHIMKSGFIOLMENQCLWSADERPFKFSMTLOWTWUYARBE6J4FGS6BKSY3S3`
+| Method | Description |
+|---|---|
+| `create_event` | Creates a new event with price, capacity, and organizer address |
+| `purchase_ticket` | Mints a ticket token, records ownership, triggers escrow deposit |
+| `transfer_ticket` | Transfers ticket ownership to a new Stellar address |
+| `verify_ticket` | Sets `verified = true` for gate entry; blocks re-entry |
+| `cancel_event` | Cancels event; triggers refunds via C2C call to escrow |
+| `complete_event` | Marks event complete; releases payout to organizer |
 
-Manages funds flow:
-* Secures ticket purchase payments in isolated escrow deposits.
-* Releases full event balance to organizers upon completion.
-* Returns exact deposit amounts to buyers if the event is cancelled.
-* Uses **Instance** storage for efficient fund tracking by event and ticket ID.
+**Storage Strategy:** Persistent storage for ticket/event data to survive ledger entry expiration.
+
+### Ticket Escrow — `ticket_escrow`
+
+**Contract ID:** [`CCHIMKSGFIOLMENQCLWSADERPFKFSMTLOWTWUYARBE6J4FGS6BKSY3S3`](https://stellar.expert/explorer/testnet/contract/CCHIMKSGFIOLMENQCLWSADERPFKFSMTLOWTWUYARBE6J4FGS6BKSY3S3)
+
+The financial custody contract. Secures all ticket purchase funds:
+
+| Method | Description |
+|---|---|
+| `deposit_funds` | Locks XLM from buyer into isolated escrow keyed by `(event_id, ticket_id)` |
+| `release_payout` | Sends full event balance to organizer on completion |
+| `refund` | Returns exact deposit to buyer on cancellation |
+
+**Storage Strategy:** Instance storage for efficient fund tracking by event and ticket ID.
 
 ---
 
 ## Wallet Integration
 
-Freighter is integrated via `@stellar/freighter-api` and `@creit.tech/stellar-wallets-kit`:
-* **Initialization**: Configures network context to `TESTNET` and registers Freighter, Hana, LOBSTR, and Albedo wallets.
-* **Authentication**: Prompts the wallet extension via a clean UI modal and imports active key addresses.
-* **Transaction Signing**: Captures transaction XDR payloads, triggers Freighter signature popups, and submits the signed envelopes back to Stellar RPC.
-* **Balance Sync**: Polls Horizon API every 15 seconds to keep XLM balance up-to-date.
+Wallet connectivity is powered by `@creit.tech/stellar-wallets-kit` with Freighter as the primary wallet:
+
+- **Initialization** — Configures `TESTNET` network context; registers Freighter, Hana, LOBSTR, and Albedo
+- **Authentication** — Opens a clean modal, retrieves the active public key, binds to Zustand store
+- **Transaction Signing** — Builds XDR payload → sends to Freighter for signing → submits signed envelope to RPC
+- **Balance Sync** — Polls Horizon API every 15 seconds; updates displayed XLM balance in Navbar
 
 ---
 
@@ -146,362 +237,357 @@ Freighter is integrated via `@stellar/freighter-api` and `@creit.tech/stellar-wa
 ticketchain_/
 ├── .github/
 │   └── workflows/
-│       └── ci-cd.yml             # GitHub Actions CI/CD pipeline
+│       └── ci-cd.yml              # GitHub Actions: build → test → deploy
 ├── contracts/
 │   ├── ticket_manager/
 │   │   └── src/
-│   │       ├── lib.rs            # Core business logic (create/purchase/transfer/verify)
-│   │       ├── test.rs           # Rust unit tests with MockAuth
-│   │       └── types.rs          # Event and Ticket struct definitions
+│   │       ├── lib.rs             # Core contract: create/purchase/transfer/verify
+│   │       ├── test.rs            # Rust unit tests with MockAuth
+│   │       └── types.rs           # Event and Ticket struct definitions
 │   ├── ticket_escrow/
 │   │   └── src/
-│   │       └── lib.rs            # Financial custody (deposit/release/refund)
-│   └── Cargo.toml                # Workspace Cargo manifest
+│   │       └── lib.rs             # Financial custody: deposit/release/refund
+│   └── Cargo.toml                 # Workspace Cargo manifest
 ├── frontend/
 │   ├── src/
-│   │   ├── components/           # Navbar, Footer, TransactionFeed
-│   │   ├── hooks/useTickets.ts   # React Query mutations and queries
-│   │   ├── pages/                # 10 page components
-│   │   ├── services/stellar.ts   # Stellar SDK service layer
-│   │   ├── store/                # Zustand global state
-│   │   └── __tests__/            # Vitest test suites
-│   ├── .env                      # Testnet contract IDs
+│   │   ├── components/
+│   │   │   ├── Navbar.tsx         # Wallet connect, balance, mobile drawer
+│   │   │   ├── Footer.tsx         # Links and feedback
+│   │   │   └── TransactionFeed.tsx # Real-time TX status toasts
+│   │   ├── hooks/
+│   │   │   └── useTickets.ts      # React Query mutations and queries
+│   │   ├── pages/                 # 10 page components
+│   │   │   ├── LandingPage.tsx
+│   │   │   ├── ExplorePage.tsx
+│   │   │   ├── CreateEventPage.tsx
+│   │   │   ├── MyTicketsPage.tsx
+│   │   │   ├── TicketDetailsPage.tsx
+│   │   │   ├── OrganizerDashboardPage.tsx
+│   │   │   ├── UserDashboardPage.tsx
+│   │   │   ├── VerifyPage.tsx
+│   │   │   ├── AboutPage.tsx
+│   │   │   └── NotFoundPage.tsx
+│   │   ├── services/
+│   │   │   └── stellar.ts         # Stellar SDK: RPC calls, wallet ops, event streaming
+│   │   ├── store/
+│   │   │   └── useTicketStore.ts  # Zustand: separate sim/testnet state planes
+│   │   ├── utils/
+│   │   │   ├── analytics.ts       # GA4 event tracking (20+ typed functions)
+│   │   │   └── sentry.ts          # Sentry error monitoring wrapper
+│   │   └── __tests__/             # Vitest test suites
+│   ├── index.html                 # GA4 gtag.js loader
+│   ├── .env                       # Contract IDs (not committed — see .env.example)
 │   ├── package.json
 │   └── vite.config.ts
-├── LEVEL4_AUDIT_REPORT.md        # Level 4 compliance audit
-├── LEVEL4_MISSING_ITEMS.md       # Outstanding items for Level 4
-├── LEVEL4_SUBMISSION_CHECKLIST.md # Final submission checklist
-├── USER_ONBOARDING_CHECKLIST.md  # 10-user onboarding records
-├── ANALYTICS_SETUP_REPORT.md     # Analytics & monitoring setup guide
-├── architecture.md               # Mermaid system flow diagrams
-├── netlify.toml                  # Netlify deployment config
-└── README.md                     # This file
+├── netlify.toml                   # Netlify: base=frontend, publish=dist, SPA redirect
+└── README.md                      # This file
 ```
 
 ---
 
-## Installation
+## Getting Started
 
 ### Prerequisites
 
-* Node.js (v18+)
-* Rust & Cargo (v1.78+)
-* Soroban CLI (for contract deployment)
-* Freighter browser extension (https://www.freighter.app/)
+| Tool | Version | Link |
+|---|---|---|
+| Node.js | v18+ | https://nodejs.org |
+| Rust & Cargo | v1.78+ | https://rustup.rs |
+| Soroban CLI | latest | `cargo install stellar-cli` |
+| Freighter Extension | latest | https://www.freighter.app |
 
-### Steps
+### 1. Clone the repository
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/codeepsingh/TicketChain.git
-   cd ticketchain_
-   ```
-
-2. Install frontend dependencies:
-   ```bash
-   cd frontend
-   npm install
-   ```
-
-3. Build contracts (optional, requires Rust toolchain):
-   ```bash
-   cd ../contracts
-   cargo build --target wasm32-unknown-unknown --release
-   ```
-
----
-
-## Environment Variables
-
-Create or verify `frontend/.env`:
-
-```env
-VITE_TICKET_MANAGER_CONTRACT=CA5PG7SDYI7X6AJMRBX6DZL5LA4YT5I7WECPH347FDSSOBDU73GUZ76O
-VITE_TICKET_ESCROW_CONTRACT=CCHIMKSGFIOLMENQCLWSADERPFKFSMTLOWTWUYARBE6J4FGS6BKSY3S3
-VITE_TICKET_TOKEN_CONTRACT=CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC
+```bash
+git clone https://github.com/codeepsingh/TicketChain.git
+cd ticketchain_
 ```
 
----
+### 2. Install frontend dependencies
 
-## Running Locally
+```bash
+cd frontend
+npm install
+```
 
-Start the development server:
+### 3. Build smart contracts (optional)
+
+Requires Rust toolchain with `wasm32-unknown-unknown` target:
+
+```bash
+rustup target add wasm32-unknown-unknown
+cd contracts
+cargo build --target wasm32-unknown-unknown --release
+```
+
+### 4. Start the development server
 
 ```bash
 cd frontend
 npm run dev
 ```
 
-Open `http://localhost:5173/` in your browser.
+Open [http://localhost:5173](http://localhost:5173) in your browser.
+
+---
+
+## Environment Variables
+
+Create `frontend/.env` from the example below. The contract IDs are already deployed on Stellar Testnet:
+
+```env
+# Soroban Contract IDs (Stellar Testnet)
+VITE_TICKET_MANAGER_CONTRACT=CA5PG7SDYI7X6AJMRBX6DZL5LA4YT5I7WECPH347FDSSOBDU73GUZ76O
+VITE_TICKET_ESCROW_CONTRACT=CCHIMKSGFIOLMENQCLWSADERPFKFSMTLOWTWUYARBE6J4FGS6BKSY3S3
+VITE_TICKET_TOKEN_CONTRACT=CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC
+
+# Analytics & Monitoring (optional)
+VITE_GA4_MEASUREMENT_ID=G-XXXXXXXXXX
+VITE_SENTRY_DSN=https://your-dsn@sentry.io/project
+```
 
 ---
 
 ## Running Tests
 
 ```bash
-# Frontend tests
+# Frontend unit tests (Vitest)
 cd frontend
 npm run test
 
-# Contract tests
+# Rust contract tests
 cd contracts
 cargo test
 ```
 
 ---
 
-## Building Production
+## CI/CD Pipeline
+
+GitHub Actions (`.github/workflows/ci-cd.yml`) runs automatically on every push to `main`:
+
+```
+Push to main
+    │
+    ├── [Job 1] Contracts
+    │     ├── Install Rust toolchain + wasm32 target
+    │     ├── Cache Cargo dependencies
+    │     ├── cargo build --target wasm32-unknown-unknown --release
+    │     └── cargo test
+    │
+    └── [Job 2] Frontend (requires contracts to pass)
+          ├── Install Node 20
+          ├── npm ci
+          ├── npm run test
+          ├── npm run build
+          └── Deploy frontend/dist → Netlify
+```
+
+The live site at [ticketchain1.netlify.app](https://ticketchain1.netlify.app/) auto-updates within ~2 minutes of any `main` push.
+
+---
+
+## Deployment
+
+### Contract Deployment (Stellar Testnet)
+
+Contracts are already deployed. To redeploy from scratch:
+
+```bash
+# 1. Add testnet network
+stellar network add testnet \
+  --rpc-url https://soroban-testnet.stellar.org \
+  --network-passphrase "Test SDF Network ; September 2015"
+
+# 2. Fund deployer account
+stellar keys fund my-deployer-key --network testnet
+
+# 3. Deploy escrow contract first
+stellar contract deploy \
+  --wasm contracts/target/wasm32-unknown-unknown/release/ticket_escrow.wasm \
+  --source my-deployer-key \
+  --network testnet
+
+# 4. Deploy manager contract (with escrow address in constructor)
+stellar contract deploy \
+  --wasm contracts/target/wasm32-unknown-unknown/release/ticket_manager.wasm \
+  --source my-deployer-key \
+  --network testnet
+```
+
+### Frontend Deployment (Netlify)
+
+Automatic on every push to `main` via GitHub Actions. To deploy manually:
 
 ```bash
 cd frontend
 npm run build
+npx netlify deploy --dir=dist --prod
 ```
 
-Output is in `frontend/dist/`.
+### Wallet Setup for Users
 
----
-
-## Deployment Instructions
-
-### Contract Deployment
-
-1. Set up testnet network:
-   ```bash
-   stellar network add --rpc-url https://soroban-testnet.stellar.org --network-passphrase "Test SDF Network ; September 2015" testnet
-   ```
-
-2. Fund deployer account:
-   ```bash
-   stellar keys fund my-deployer-key --network testnet
-   ```
-
-3. Deploy WASM bytecodes:
-   ```bash
-   stellar contract deploy --wasm ../target/wasm32-unknown-unknown/release/ticket_escrow.wasm --source my-deployer-key --network testnet
-   stellar contract deploy --wasm ../target/wasm32-unknown-unknown/release/ticket_manager.wasm --source my-deployer-key --network testnet
-   ```
-
-### Frontend Deployment (Netlify)
-
-1. Push to `main` branch — GitHub Actions automatically builds and deploys
-2. Manual deploy:
-   ```bash
-   npx netlify deploy --dir=frontend/dist --prod
-   ```
-
-### Wallet Setup
-
-1. Install [Freighter Wallet](https://www.freighter.app/) extension.
-2. Switch Freighter to **Testnet** mode.
-3. Fund your testnet account at [Stellar Laboratory Faucet](https://laboratory.stellar.org/#account-creator?network=testnet).
+1. Install [Freighter Wallet](https://www.freighter.app/) browser extension
+2. Switch Freighter to **Testnet** mode
+3. Fund your testnet account at the [Stellar Laboratory Faucet](https://laboratory.stellar.org/#account-creator?network=testnet)
 
 ---
 
 ## Usage Guide
 
-### How To Create Event
+### Create an Event (Organizer)
 
-1. Click **For Organizers** in the navigation bar.
-2. Select **Create New Event**.
-3. Fill out the name, capacity, date, ticket price (XLM), and click **Create Event**.
-4. Approve the wallet signature request in Freighter.
-5. Transaction confirms in ~5 seconds; event appears in Explore page.
+1. Connect your Freighter wallet via the **Connect Wallet** button
+2. Navigate to **For Organizers → Create New Event**
+3. Fill in event name, capacity, date, and ticket price (XLM)
+4. Click **Create Event** — approve the Freighter signature popup
+5. Transaction confirms in ~5s; event appears on the Explore page
 
-### How To Buy Ticket
+### Purchase a Ticket (Attendee)
 
-1. Go to **Explore Events**.
-2. Click **Get Tickets** on an active event card.
-3. Select ticket quantity and click **Sign & Pay with Freighter**.
-4. Accept transaction fee prompt in Freighter.
-5. Ticket appears in **My Tickets** dashboard.
+1. Go to **Explore Events** — browse all active events on-chain
+2. Click **Get Tickets** on any event card
+3. Review ticket price and click **Sign & Pay with Freighter**
+4. Approve the XLM payment in Freighter
+5. Ticket appears in **My Tickets** with a unique on-chain ID
 
-### How To Transfer Ticket
+### Transfer a Ticket
 
-1. Go to **My Tickets**.
-2. Select **View Ticket** to open the details page.
-3. Scroll to **Transfer Ticket** section.
-4. Enter the recipient's Stellar address and confirm.
-5. Approve wallet signature; ticket ownership updates on-chain.
+1. Go to **My Tickets → View Ticket**
+2. Scroll to the **Transfer Ticket** section
+3. Enter the recipient's Stellar address and confirm
+4. Approve wallet signature — ownership updates on-chain immediately
 
-### How To Verify Ticket
+### Gate Verification (Verifier)
 
-1. Go to **Gate Scanner** in the navigation menu.
-2. Enter the Ticket ID manually in the validation form.
-3. Click **Verify** — the gate checks the on-chain `verified` flag.
-4. Green panel: Access granted. Red panel: Already scanned or cancelled.
+1. Navigate to **Gate Scanner**
+2. Enter the Ticket ID from the attendee's ticket card
+3. Click **Verify** — contract checks the `verified` flag on-chain
+4. ✅ Green: Access granted (flag set to true, re-entry blocked)
+5. ❌ Red: Already scanned or invalid ticket
 
-### How To Disburse Escrow (Organizer)
+### Disburse Escrow Funds (Organizer)
 
-1. Go to **Organizer Portal** → **Overview**.
-2. Find the completed event in your hosted events table.
-3. Click **Disburse Escrow** — confirms an on-chain call to release funds.
+1. Go to **Organizer Portal → Overview**
+2. Find your completed event in the hosted events table
+3. Click **Complete Event** → then **Disburse Escrow**
+4. XLM balance transfers from escrow contract to your wallet
+
+---
+
+## Security
+
+| Layer | Mechanism |
+|---|---|
+| **Ownership Verification** | Tickets tied to `buyer` address; only owner can transfer |
+| **Double-Spend Protection** | `verified` flag immutably set on first scan; re-entry rejected |
+| **Verifier Authorization** | Only whitelisted addresses can call `verify_ticket` |
+| **Escrow Caller Guard** | Escrow `release_payout` and `refund` only callable by `ticket_manager` |
+| **Preflight Simulation** | All transactions simulated before signing — bad params caught before fees |
+| **Persistent Storage** | Ticket/event data uses `Persistent` storage to survive ledger expiration |
+| **Contract ID Validation** | Frontend validates all 56-character C-prefixed contract IDs on mount |
+| **Balance Pre-check** | XLM balance verified before submitting purchase transaction |
 
 ---
 
 ## Error Handling
 
-* **Simulation Failures**: Trapped with `rpc.Api.isSimulationError()` and rendered as descriptive messages before signing.
-* **Wallet Cancellations**: Freighter rejections caught and the loading overlay dismissed with user-friendly message.
-* **Network Timeouts**: Polling loops stop after 10 retries, providing a failure message with the txHash.
-* **Invalid Contract IDs**: `App.tsx` validates contract IDs on mount and resets to defaults if malformed.
-* **Insufficient Balance**: Pre-checked before transaction submission with XLM balance guard.
+Seven layers of error handling are implemented throughout the application:
+
+1. **Wallet guard** — All mutations require a connected wallet address
+2. **Simulation error** — `rpc.Api.isSimulationError()` catches preflight failures before signing
+3. **Signing rejection** — Freighter cancellations caught; loading overlay dismissed gracefully
+4. **On-chain execution error** — `ERROR` transaction status detected and surfaced as a message
+5. **Polling timeout** — Loop exits after 10 retries with the txHash for manual inspection
+6. **UI error banners** — Inline error messages in `CreateEventPage` and `ExplorePage`
+7. **Sentry capture** — `captureContractError()` called in all catch blocks for monitoring
 
 ---
 
-## Responsive Design
+## Roadmap
 
-Built with Tailwind CSS v4 featuring:
-* **Mobile-first layouts**: Single-column on mobile, multi-column on desktop
-* **Mobile navigation drawer**: Hamburger menu with slide-in animation
-* **Fluid typography**: `text-display-xl` scales from 72px (desktop) to responsive mobile sizes
-* **Glassmorphism cards**: `backdrop-blur-20px` + semi-transparent backgrounds
-* **3D ticket mockup**: CSS `perspective-1000` + `rotateY/rotateX` transforms
-
----
-
-## Security Features
-
-* **Storage Allocation**: Persistent storage prevents ticket ownership state expiration.
-* **Cross-Contract Bounds**: Escrow payouts verify manager caller signatures.
-* **Verification Authority Check**: Only authorized verifier addresses can validate tickets.
-* **Double-Spend Protection**: `verified` flag in contract blocks re-entry.
-* **Preflight Simulation**: All transactions simulated before signing — bad params caught before fees are paid.
-* **Contract ID Validation**: Frontend validates all contract IDs are 56-character C-prefixed strings before use.
+| Priority | Feature |
+|---|---|
+| 🔥 High | USDC payment support via Stellar Asset Contract |
+| 🔥 High | Real-time Horizon SSE event feed (replace polling) |
+| 🟡 Medium | Resale price caps enforced in-contract (anti-scalping) |
+| 🟡 Medium | NFT collectible badges issued post-event |
+| 🟢 Low | React Native mobile app using same Soroban service layer |
+| 🟢 Low | Multi-signature event organizer accounts |
 
 ---
 
-## CI/CD Pipeline
+## Stellar Level Compliance
 
-GitHub Actions (`.github/workflows/ci-cd.yml`) runs on every push to `main`:
+### ✅ Level 1 — White Belt
+- [x] Wallet setup (Freighter + stellar-wallets-kit)
+- [x] Wallet connection (address retrieval + store binding)
+- [x] Wallet disconnect (localStorage clear + state reset)
+- [x] Balance fetch (Horizon API native XLM)
+- [x] Balance display (Navbar + Dashboard)
+- [x] Testnet transaction (preflight → sign → submit → confirm cycle)
+- [x] Transaction feedback (pending → processing → confirmed toasts)
+- [x] README documentation
 
-1. **Contracts Job**: Installs Rust toolchain → caches dependencies → builds WASM → runs `cargo test`
-2. **Frontend Job** (requires contracts to pass): Installs Node 20 → `npm ci` → `npm run test` → `npm run build`
-3. **Deployment**: Deploys `frontend/dist` to Netlify via `netlify-cli`
-4. **GitHub Deployment Status**: Updates deployment status badge on success/failure
+### ✅ Level 2 — Orange Belt
+- [x] Smart contract deployed on Testnet
+- [x] Frontend contract integration (all 7 contract methods wired)
+- [x] Transaction status tracking (`TransactionFeed` component)
+- [x] Error handling (3+ error types: simulation, signing, execution)
+- [x] Real-time updates (React Query cache invalidation)
+- [x] 15+ meaningful commits (26 total)
+- [x] Multi-wallet support (Freighter, Albedo, Hana, LOBSTR)
+
+### ✅ Level 3 — Yellow Belt
+- [x] Advanced smart contracts (Persistent/Instance storage, custom types)
+- [x] Inter-contract communication (TicketManager ↔ TicketEscrow C2C)
+- [x] Event streaming (Soroban `getEvents` polling in `stellar.ts`)
+- [x] CI/CD pipeline (GitHub Actions: build + test + deploy)
+- [x] Mobile responsive UI (Tailwind breakpoints + hamburger drawer)
+- [x] Loading states (spinners, overlays, button pending states)
+- [x] Error handling (UI banners, try-catch boundaries, error types)
+- [x] Contract tests (Rust unit tests in `test.rs`)
+- [x] Frontend tests (Vitest test suite)
+- [x] Production architecture (services / hooks / store / pages)
+- [x] Documentation (README + architecture diagrams)
+- [x] Demo-ready (offline simulator engine)
+
+### 🔄 Level 4 — Production MVP
+- [x] Fully functional production MVP
+- [x] Stable frontend architecture (React 19 + TypeScript + Vite)
+- [x] Stable smart contract architecture (2 Soroban contracts + C2C)
+- [x] Mobile responsive UI
+- [x] Proper loading states
+- [x] Proper error handling (7 layers)
+- [x] Production deployment ([ticketchain1.netlify.app](https://ticketchain1.netlify.app/))
+- [x] Optimized UX (premium glassmorphism, holographic ticket, 3D transforms)
+- [x] Proper project structure (utils / components / hooks / services / store / pages)
+- [x] Complete documentation
+- [x] Smart contracts on Testnet (2 verified contracts)
+- [x] 15+ meaningful commits (26 commits)
+- [x] Public GitHub repository
+- [x] Technical complexity demonstrated (C2C, preflight, polling, event streaming)
+- [x] Real-world usefulness demonstrated (3 verified fraud problems solved)
+- [x] Analytics integration (GA4 — `utils/analytics.ts`, `index.html`)
+- [x] Monitoring integration (Sentry — `utils/sentry.ts`, all catch blocks)
+- [ ] 10 real users onboarded *(recruit via live demo link)*
+- [ ] Demo video *(record 60-90 sec screen capture and add URL below)*
 
 ---
 
-## Screenshots
+## Submission Details
 
-> Replace placeholder paths with actual screenshots for final submission.
-
-### Wallet Connected
-![Wallet Connected Placeholder](/frontend/public/screenshots/wallet_connected.png)
-
-### Balance Display
-![Balance Display Placeholder](/frontend/public/screenshots/balance_display.png)
-
-### Contract Interaction
-![Contract Interaction Placeholder](/frontend/public/screenshots/contract_interaction.png)
-
-### Transaction Success
-![Transaction Success Placeholder](/frontend/public/screenshots/transaction_success.png)
-
-### Event Creation
-![Event Creation Placeholder](/frontend/public/screenshots/event_creation.png)
-
-### Ticket Purchase
-![Ticket Purchase Placeholder](/frontend/public/screenshots/ticket_purchase.png)
-
-### Ticket Verification
-![Ticket Verification Placeholder](/frontend/public/screenshots/ticket_verification.png)
-
-### Mobile View
-![Mobile View Placeholder](/frontend/public/screenshots/mobile_view.png)
-
-### CI/CD Pipeline
-![CI/CD Pipeline Placeholder](/frontend/public/screenshots/cicd_pipeline.png)
-
-### Organizer Dashboard
-![Organizer Dashboard](/frontend/public/screenshots/organizer_dashboard.png)
-
----
-
-## Future Roadmap
-
-1. **Web3 Event Streaming**: Integrate Horizon Server-Sent Events (SSE) for real-time ticket activity feeds.
-2. **Primary-to-Secondary Resale Gates**: Restrict ticket resale prices in-contract to mitigate scalping.
-3. **USDC Payment Support**: Enable USDC as an alternative payment token via Stellar Asset Contract.
-4. **Mobile App**: React Native port using the same Soroban service layer.
-5. **NFT Ticket Collectibles**: Issue post-event commemorative NFT badges.
-
----
-
-## Contributors
-
-* Principal React Architect & Stellar Developer
+| Field | Value |
+|---|---|
+| **GitHub Repository** | [github.com/codeepsingh/TicketChain](https://github.com/codeepsingh/TicketChain) |
+| **Live Demo** | [ticketchain1.netlify.app](https://ticketchain1.netlify.app/) |
+| **Network** | Stellar Testnet |
+| **Manager Contract** | [`CA5PG7SDYI7X6AJMRBX6DZL5LA4YT5I7WECPH347FDSSOBDU73GUZ76O`](https://stellar.expert/explorer/testnet/contract/CA5PG7SDYI7X6AJMRBX6DZL5LA4YT5I7WECPH347FDSSOBDU73GUZ76O) |
+| **Escrow Contract** | [`CCHIMKSGFIOLMENQCLWSADERPFKFSMTLOWTWUYARBE6J4FGS6BKSY3S3`](https://stellar.expert/explorer/testnet/contract/CCHIMKSGFIOLMENQCLWSADERPFKFSMTLOWTWUYARBE6J4FGS6BKSY3S3) |
+| **Demo Video** | *(Add YouTube URL after recording)* |
 
 ---
 
 ## License
 
-MIT License.
-
----
-
-# Stellar Level 4 Compliance
-
-## Level 1 — White Belt
-- [x] Wallet Setup (Freighter + stellar-wallets-kit)
-- [x] Wallet Connection (address retrieval + store binding)
-- [x] Wallet Disconnect (localStorage clear + state reset)
-- [x] Balance Fetch (Horizon API native XLM balance)
-- [x] Balance Display (Navbar + Dashboard rendering)
-- [x] Testnet Transaction (full preflight → sign → submit cycle)
-- [x] Transaction Feedback (pending → processing → confirmed toast)
-- [x] README
-
-## Level 2 — Orange Belt
-- [x] Smart Contract Deployed on Testnet
-- [x] Frontend Contract Integration (all 7 contract methods wired)
-- [x] Transaction Status (TransactionFeed component)
-- [x] Error Handling (3+ error types: simulation, signing, execution)
-- [x] Real-Time Updates (React Query cache invalidation)
-- [x] 15+ Meaningful Commits (25 total)
-- [x] Multi-Wallet Support (Freighter, Albedo, Hana, LOBSTR)
-
-## Level 3 — Yellow Belt
-- [x] Advanced Smart Contracts (Persistent/Instance storage, custom types)
-- [x] Inter-Contract Communication (TicketManager ↔ TicketEscrow C2C)
-- [x] Event Streaming (Soroban `getEvents` polling in `stellar.ts`)
-- [x] CI/CD Pipeline (GitHub Actions with build + test + deploy)
-- [x] Mobile Responsive UI (Tailwind breakpoints + mobile drawer)
-- [x] Loading States (spinners, overlays, button pending states)
-- [x] Error Handling (UI banners, try-catch boundaries)
-- [x] Contract Tests (Rust unit tests in `test.rs`)
-- [x] Frontend Tests (Vitest test suite)
-- [x] Production Architecture (services/hooks/store/pages separation)
-- [x] Documentation (README + architecture.md + audit reports)
-- [x] Demo Ready (offline simulator engine)
-
-## Level 4 — Production MVP
-- [x] Fully Functional Production MVP
-- [x] Stable Frontend Architecture
-- [x] Stable Smart Contract Architecture
-- [x] Mobile Responsive UI
-- [x] Proper Loading States
-- [x] Proper Error Handling
-- [x] Production Deployment (https://ticketchain1.netlify.app/)
-- [x] Optimized User Experience (premium glassmorphism UI)
-- [x] Proper Project Structure
-- [x] Complete Documentation
-- [x] Smart Contracts on Testnet
-- [x] 15+ Meaningful Commits
-- [x] Public GitHub Repository
-- [x] Technical Complexity Demonstrated
-- [x] Real-World Usefulness Demonstrated
-- [ ] Analytics Integration (GA4 — see ANALYTICS_SETUP_REPORT.md)
-- [ ] Monitoring Integration (Sentry — see ANALYTICS_SETUP_REPORT.md)
-- [ ] 10 Real Users Onboarded (see USER_ONBOARDING_CHECKLIST.md)
-- [ ] Demo Video (record and upload to replace placeholder URL)
-
----
-
-# Submission Details
-
-* **GitHub Repository**: [https://github.com/codeepsingh/TicketChain](https://github.com/codeepsingh/TicketChain)
-* **Live Demo**: [https://ticketchain1.netlify.app/](https://ticketchain1.netlify.app/)
-* **Manager Contract**: [`CA5PG7SDYI7X6AJMRBX6DZL5LA4YT5I7WECPH347FDSSOBDU73GUZ76O`](https://stellar.expert/explorer/testnet/contract/CA5PG7SDYI7X6AJMRBX6DZL5LA4YT5I7WECPH347FDSSOBDU73GUZ76O)
-* **Escrow Contract**: [`CCHIMKSGFIOLMENQCLWSADERPFKFSMTLOWTWUYARBE6J4FGS6BKSY3S3`](https://stellar.expert/explorer/testnet/contract/CCHIMKSGFIOLMENQCLWSADERPFKFSMTLOWTWUYARBE6J4FGS6BKSY3S3)
-* **Demo Video**: `[RECORD AND ADD URL HERE]`
-* **Network**: Stellar Testnet
+MIT License — see [LICENSE](LICENSE) for details.
