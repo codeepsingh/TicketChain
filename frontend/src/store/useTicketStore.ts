@@ -118,8 +118,8 @@ export const useTicketStore = create<TicketStore>()(
       walletAddress: null,
       walletConnected: false,
       walletName: null,
-      networkMode: 'simulator',
-      tokenBalance: 1000, // Initial simulator tokens
+      networkMode: 'testnet',
+      tokenBalance: 0, // Initial balance starts at 0 for actual wallets
       managerContractId: 'CC3TICKETMANAGER...TESTNET',
       escrowContractId: 'CC3TICKETESCROW...TESTNET',
 
@@ -153,8 +153,8 @@ export const useTicketStore = create<TicketStore>()(
         const currentTickets = get().tickets;
         let newTickets = [...currentTickets];
         
-        // If the user has no tickets yet, give them a couple of mock tickets for testing
-        if (currentTickets.filter(t => t.owner === address).length === 0) {
+        // If in simulator mode and the user has no tickets yet, give them mock tickets for testing
+        if (get().networkMode === 'simulator' && currentTickets.filter(t => t.owner === address).length === 0) {
           newTickets = [
             ...currentTickets,
             {
@@ -194,7 +194,17 @@ export const useTicketStore = create<TicketStore>()(
           walletAddress: null,
           walletConnected: false,
           walletName: null,
+          tokenBalance: 0,
+          tickets: [],
+          transactions: [],
+          activities: [],
         });
+        try {
+          localStorage.removeItem('ticketchain-storage');
+          sessionStorage.clear();
+        } catch (e) {
+          console.error('Error clearing storage on disconnect:', e);
+        }
       },
 
       setNetworkMode: (mode) => set({ networkMode: mode }),

@@ -31,7 +31,14 @@ export const UserDashboardPage: React.FC = () => {
   };
 
   const formatAddress = (addr: string) => {
+    if (!addr) return '';
     return `${addr.slice(0, 8)}...${addr.slice(-6)}`;
+  };
+
+  const formatTxHash = (hash?: string) => {
+    if (!hash) return '';
+    if (hash.length <= 16) return hash;
+    return `${hash.slice(0, 8)}...${hash.slice(-6)}`;
   };
 
   return (
@@ -173,7 +180,7 @@ export const UserDashboardPage: React.FC = () => {
                             <div className="flex gap-2 items-center text-[10px] text-on-surface-variant">
                               <span>{new Date(act.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                               <span>•</span>
-                              <span className="font-mono text-secondary">{act.txHash}</span>
+                              <span className="font-mono text-secondary truncate" title={act.txHash}>{formatTxHash(act.txHash)}</span>
                             </div>
                           </div>
                         </div>

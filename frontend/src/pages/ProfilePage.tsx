@@ -1,9 +1,10 @@
 import React from 'react';
 import { useTicketStore } from '../store/useTicketStore';
 import { useTickets } from '../hooks/useTickets';
+import { connectStellarWallet } from '../services/stellar';
 
 export const ProfilePage: React.FC = () => {
-  const { walletAddress, walletConnected, tokenBalance, walletName } = useTicketStore();
+  const { walletAddress, walletConnected, tokenBalance, walletName, networkMode } = useTicketStore();
   const { data: tickets } = useTickets(walletAddress);
 
   const formatAddress = (addr: string) => {
@@ -29,6 +30,12 @@ export const ProfilePage: React.FC = () => {
             <span className="material-symbols-outlined text-[64px] text-primary mb-4">account_circle</span>
             <h3 className="font-title-md text-title-md text-on-surface">Connect Wallet</h3>
             <p className="text-on-surface-variant mt-2 mb-6">Connect your wallet to retrieve your profile metadata.</p>
+            <button 
+              onClick={() => connectStellarWallet(networkMode)}
+              className="btn-primary-gradient px-8 py-3 rounded-full font-label-sm text-label-sm text-white cursor-pointer shadow-lg active:scale-95 transition-transform"
+            >
+              Connect Wallet
+            </button>
           </div>
         ) : (
           <div className="glass-card rounded-[32px] p-8 flex flex-col items-center">

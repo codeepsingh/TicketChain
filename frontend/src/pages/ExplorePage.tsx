@@ -220,12 +220,12 @@ export const ExplorePage: React.FC = () => {
                   <button 
                     disabled={isSoldOut}
                     onClick={() => handleOpenPurchase(event)}
-                    className="w-full bg-transparent border border-primary-container text-primary font-label-sm text-label-sm py-3 rounded-lg group-hover:bg-primary-container group-hover:text-white transition-all duration-300 opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                    className="w-full py-3 rounded-lg font-label-sm text-label-sm transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer bg-primary-container text-white lg:bg-transparent lg:border lg:border-primary-container lg:text-primary lg:opacity-0 lg:translate-y-4 lg:group-hover:opacity-100 lg:group-hover:translate-y-0 lg:group-hover:bg-primary-container lg:group-hover:text-white"
                   >
                     {isSoldOut ? 'Sold Out' : 'Get Tickets'}
                   </button>
                   {/* Spacer for hover button */}
-                  <div className="h-10 group-hover:block hidden"></div>
+                  <div className="h-10 lg:group-hover:block hidden"></div>
                 </div>
               </article>
             );

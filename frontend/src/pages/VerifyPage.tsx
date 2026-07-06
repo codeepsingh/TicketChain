@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { useTicketStore } from '../store/useTicketStore';
 import { useVerifyTicket, useEvents } from '../hooks/useTickets';
+import { connectStellarWallet } from '../services/stellar';
 
 export const VerifyPage: React.FC = () => {
-  const { tickets } = useTicketStore();
+  const { tickets, walletConnected, networkMode } = useTicketStore();
   const { data: events } = useEvents();
   const verifyMutation = useVerifyTicket();
 
@@ -110,9 +111,22 @@ export const VerifyPage: React.FC = () => {
         </p>
       </header>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start max-w-5xl mx-auto">
-        {/* Scanner view Left */}
-        <div className="glass-card rounded-[32px] p-6 flex flex-col items-center justify-center aspect-video relative overflow-hidden border border-outline-variant/30 min-h-[350px]">
+      {!walletConnected ? (
+        <div className="max-w-md mx-auto text-center py-20 bg-surface-container-low border border-outline-variant/20 rounded-[24px] mt-10">
+          <span className="material-symbols-outlined text-[64px] text-primary mb-4">account_balance_wallet</span>
+          <h3 className="font-title-md text-title-md text-on-surface">Connect Your Wallet</h3>
+          <p className="text-on-surface-variant mt-2 mb-6">You need to connect a Stellar wallet to run gate verification signatures.</p>
+          <button 
+            onClick={() => connectStellarWallet(networkMode)}
+            className="btn-primary-gradient px-8 py-3 rounded-full font-label-sm text-label-sm text-white cursor-pointer shadow-lg active:scale-95 transition-transform"
+          >
+            Connect Wallet
+          </button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start max-w-5xl mx-auto">
+          {/* Scanner view Left */}
+          <div className="glass-card rounded-[32px] p-6 flex flex-col items-center justify-center aspect-video relative overflow-hidden border border-outline-variant/30 min-h-[350px]">
           {scanning ? (
             <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center z-10">
               <div className="w-48 h-48 border-2 border-dashed border-secondary/50 rounded-2xl relative animate-pulse flex items-center justify-center">

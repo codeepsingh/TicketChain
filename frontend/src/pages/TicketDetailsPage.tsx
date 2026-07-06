@@ -108,12 +108,12 @@ export const TicketDetailsPage: React.FC = () => {
       {/* Ticket Container */}
       <div className="w-full max-w-md mx-auto">
         {/* Holographic Ticket */}
-        <div className="relative w-full aspect-[1/2] rounded-[32px] bg-surface-container-low border border-outline-variant/30 overflow-hidden ticket-shadow flex flex-col">
+        <div className="relative w-full aspect-auto md:aspect-[1/2] min-h-[680px] md:min-h-0 rounded-[32px] bg-surface-container-low border border-outline-variant/30 overflow-hidden ticket-shadow flex flex-col">
           {/* Hologram Overlay */}
           <div className="absolute inset-0 hologram-effect z-20 mix-blend-overlay"></div>
           
           {/* Event Banner */}
-          <div className="relative h-1/3 w-full shrink-0">
+          <div className="relative h-[180px] md:h-1/3 w-full shrink-0">
             <img 
               alt="Event Cover" 
               className="absolute inset-0 w-full h-full object-cover" 

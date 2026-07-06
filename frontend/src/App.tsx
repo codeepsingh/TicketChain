@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { TransactionFeed } from './components/TransactionFeed';
-import { streamLedgerEvents } from './services/stellar';
+import { streamLedgerEvents, StellarService } from './services/stellar';
 import { useTicketStore } from './store/useTicketStore';
 
 // Pages
@@ -29,7 +29,7 @@ const queryClient = new QueryClient({
 });
 
 const App: React.FC = () => {
-  const { managerContractId, networkMode, addActivity } = useTicketStore();
+  const { managerContractId, networkMode, addActivity, walletAddress, walletConnected, updateTokenBalance } = useTicketStore();
 
   useEffect(() => {
     if (networkMode !== 'testnet') return;
@@ -50,6 +50,30 @@ const App: React.FC = () => {
       console.error('Failed to initialize Stellar Event Stream:', e);
     }
   }, [managerContractId, networkMode, addActivity]);
+
+  useEffect(() => {
+    if (networkMode !== 'testnet' || !walletConnected || !walletAddress) return;
+
+    let active = true;
+    const fetchBalance = async () => {
+      try {
+        const bal = await StellarService.getAccountBalance(walletAddress);
+        if (active) {
+          updateTokenBalance(bal);
+        }
+      } catch (err) {
+        console.error('Error syncing balance:', err);
+      }
+    };
+
+    fetchBalance();
+    const interval = setInterval(fetchBalance, 15000); // Sync balance every 15s
+
+    return () => {
+      active = false;
+      clearInterval(interval);
+    };
+  }, [walletAddress, walletConnected, networkMode, updateTokenBalance]);
 
   return (
     <QueryClientProvider client={queryClient}>

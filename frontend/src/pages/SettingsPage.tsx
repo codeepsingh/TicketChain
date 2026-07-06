@@ -90,6 +90,27 @@ export const SettingsPage: React.FC = () => {
           </section>
         )}
 
+        {/* Friendbot for Testnet */}
+        {networkMode === 'testnet' && (
+          <section className="glass-card rounded-[32px] p-8 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div>
+              <h3 className="font-title-md text-title-md text-on-surface mb-2">Stellar Testnet Friendbot</h3>
+              <p className="text-sm text-on-surface-variant max-w-md">
+                Fund your testnet account with Friendbot to purchase tickets.
+              </p>
+            </div>
+            <a 
+              href="https://laboratory.stellar.org/#account-creator?network=testnet"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-primary-gradient px-8 py-3.5 rounded-xl text-white font-semibold flex items-center gap-2 cursor-pointer shrink-0"
+            >
+              <span className="material-symbols-outlined">waves</span>
+              Go to Friendbot
+            </a>
+          </section>
+        )}
+
         {/* Smart Contract Configuration Form */}
         <section className="glass-card rounded-[32px] p-8">
           <h3 className="font-title-md text-title-md text-on-surface mb-6">Soroban Smart Contract Anchors</h3>
