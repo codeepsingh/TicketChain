@@ -29,7 +29,29 @@ const queryClient = new QueryClient({
 });
 
 const App: React.FC = () => {
-  const { managerContractId, networkMode, addActivity, walletAddress, walletConnected, updateTokenBalance } = useTicketStore();
+  const { 
+    managerContractId, 
+    escrowContractId, 
+    setContractIds, 
+    networkMode, 
+    addActivity, 
+    walletAddress, 
+    walletConnected, 
+    updateTokenBalance 
+  } = useTicketStore();
+
+  useEffect(() => {
+    const defaultManager = import.meta.env.VITE_TICKET_MANAGER_CONTRACT || 'CA5PG7SDYI7X6AJMRBX6DZL5LA4YT5I7WECPH347FDSSOBDU73GUZ76O';
+    const defaultEscrow = import.meta.env.VITE_TICKET_ESCROW_CONTRACT || 'CCHIMKSGFIOLMENQCLWSADERPFKFSMTLOWTWUYARBE6J4FGS6BKSY3S3';
+    
+    if (
+      !managerContractId || managerContractId.length !== 56 || !managerContractId.startsWith('C') ||
+      !escrowContractId || escrowContractId.length !== 56 || !escrowContractId.startsWith('C')
+    ) {
+      console.log('Sanitizing invalid persisted contract IDs from local storage...');
+      setContractIds(defaultManager, defaultEscrow);
+    }
+  }, [managerContractId, escrowContractId, setContractIds]);
 
   useEffect(() => {
     if (networkMode !== 'testnet') return;

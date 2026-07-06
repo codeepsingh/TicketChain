@@ -70,8 +70,9 @@ export const Navbar: React.FC = () => {
   };
 
   return (
-    <nav className="fixed top-0 w-full z-50 bg-surface/10 backdrop-blur-xl border-b border-white/5 shadow-[0_8px_32px_0_rgba(92,10,24,0.15)]">
-      <div className="flex justify-between items-center px-margin-mobile lg:px-margin-desktop py-4 max-w-container-max mx-auto relative min-h-[72px]">
+    <>
+      <nav className="fixed top-0 w-full z-50 bg-surface/10 backdrop-blur-xl border-b border-white/5 shadow-[0_8px_32px_0_rgba(92,10,24,0.15)]">
+        <div className="flex justify-between items-center px-margin-mobile lg:px-margin-desktop py-4 max-w-container-max mx-auto relative min-h-[72px]">
         
         {/* Mobile: Hamburger + Logo Group (Left) */}
         <div className="flex items-center gap-1 lg:gap-0 z-10">
@@ -168,8 +169,9 @@ export const Navbar: React.FC = () => {
           )}
         </div>
       </div>
+    </nav>
 
-      {/* Mobile Drawer (Slide-out menu from Left) */}
+    {/* Mobile Drawer (Slide-out menu from Left) */}
       {mobileMenuOpen && (
         <div 
           className="fixed inset-0 z-50 flex lg:hidden"
@@ -295,6 +297,6 @@ export const Navbar: React.FC = () => {
           </div>
         </div>
       )}
-    </nav>
+    </>
   );
 };

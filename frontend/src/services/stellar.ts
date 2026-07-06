@@ -270,6 +270,11 @@ export class StellarService {
 let activeStreamClose: (() => void) | null = null;
 
 export const streamLedgerEvents = (contractId: string, onEvent: (event: any) => void) => {
+  if (!contractId || contractId.length !== 56 || !contractId.startsWith('C')) {
+    console.warn(`[streamLedgerEvents] Invalid contract ID format: "${contractId}". Event streaming skipped.`);
+    return () => {};
+  }
+
   if (activeStreamClose) {
     activeStreamClose();
   }
