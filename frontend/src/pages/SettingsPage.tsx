@@ -3,13 +3,9 @@ import { useTicketStore } from '../store/useTicketStore';
 
 export const SettingsPage: React.FC = () => {
   const { 
-    networkMode, 
     managerContractId, 
     escrowContractId, 
-    tokenBalance, 
-    setNetworkMode, 
-    setContractIds, 
-    updateTokenBalance 
+    setContractIds 
   } = useTicketStore();
 
   const [managerInput, setManagerInput] = useState(managerContractId);
@@ -21,11 +17,6 @@ export const SettingsPage: React.FC = () => {
     setContractIds(managerInput, escrowInput);
     setSaveSuccess(true);
     setTimeout(() => setSaveSuccess(false), 3000);
-  };
-
-  const handleFaucet = () => {
-    updateTokenBalance(tokenBalance + 100);
-    alert('Simulated Faucet Triggered! 100 XLM added to your balance.');
   };
 
   return (
@@ -42,74 +33,24 @@ export const SettingsPage: React.FC = () => {
       </header>
 
       <div className="max-w-2xl mx-auto space-y-8">
-        {/* Network Selection Mode */}
-        <section className="glass-card rounded-[32px] p-8 space-y-6">
-          <h3 className="font-title-md text-title-md text-on-surface">Ledger Operation Mode</h3>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <button 
-              onClick={() => setNetworkMode('simulator')}
-              className={`p-6 rounded-2xl border text-left transition-all cursor-pointer ${networkMode === 'simulator' ? 'border-primary bg-primary/5 text-on-surface' : 'border-outline-variant/30 bg-surface-container/50 hover:bg-surface-container text-on-surface-variant'}`}
-            >
-              <div className="flex justify-between items-center mb-4">
-                <span className="font-semibold text-lg font-title-md text-on-surface">Simulated Sandbox</span>
-                {networkMode === 'simulator' && <span className="material-symbols-outlined text-primary">radio_button_checked</span>}
-              </div>
-              <p className="text-sm leading-relaxed">Runs in local memory with preloaded mock events. Perfect for safe demo execution and instant speed testing without wallet extensions.</p>
-            </button>
-
-            <button 
-              onClick={() => setNetworkMode('testnet')}
-              className={`p-6 rounded-2xl border text-left transition-all cursor-pointer ${networkMode === 'testnet' ? 'border-secondary bg-secondary/5 text-on-surface' : 'border-outline-variant/30 bg-surface-container/50 hover:bg-surface-container text-on-surface-variant'}`}
-            >
-              <div className="flex justify-between items-center mb-4">
-                <span className="font-semibold text-lg font-title-md text-on-surface">Stellar Testnet</span>
-                {networkMode === 'testnet' && <span className="material-symbols-outlined text-secondary">radio_button_checked</span>}
-              </div>
-              <p className="text-sm leading-relaxed">Runs real live Soroban smart contracts. Submits transactions directly to the Stellar Testnet ledger via Freighter Wallet plugin.</p>
-            </button>
-          </div>
-        </section>
-
-        {/* Faucet for Simulated Sandbox */}
-        {networkMode === 'simulator' && (
-          <section className="glass-card rounded-[32px] p-8 flex flex-col md:flex-row justify-between items-center gap-6">
-            <div>
-              <h3 className="font-title-md text-title-md text-on-surface mb-2">Simulated XLM Faucet</h3>
-              <p className="text-sm text-on-surface-variant max-w-md">
-                Claim additional sandbox currency to test tickets purchases.
-              </p>
-            </div>
-            <button 
-              onClick={handleFaucet}
-              className="btn-primary-gradient px-8 py-3.5 rounded-xl text-white font-semibold flex items-center gap-2 cursor-pointer shrink-0"
-            >
-              <span className="material-symbols-outlined">monetization_on</span>
-              Claim 100 XLM
-            </button>
-          </section>
-        )}
-
         {/* Friendbot for Testnet */}
-        {networkMode === 'testnet' && (
-          <section className="glass-card rounded-[32px] p-8 flex flex-col md:flex-row justify-between items-center gap-6">
-            <div>
-              <h3 className="font-title-md text-title-md text-on-surface mb-2">Stellar Testnet Friendbot</h3>
-              <p className="text-sm text-on-surface-variant max-w-md">
-                Fund your testnet account with Friendbot to purchase tickets.
-              </p>
-            </div>
-            <a 
-              href="https://laboratory.stellar.org/#account-creator?network=testnet"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-primary-gradient px-8 py-3.5 rounded-xl text-white font-semibold flex items-center gap-2 cursor-pointer shrink-0"
-            >
-              <span className="material-symbols-outlined">waves</span>
-              Go to Friendbot
-            </a>
-          </section>
-        )}
+        <section className="glass-card rounded-[32px] p-8 flex flex-col md:flex-row justify-between items-center gap-6">
+          <div>
+            <h3 className="font-title-md text-title-md text-on-surface mb-2">Stellar Testnet Friendbot</h3>
+            <p className="text-sm text-on-surface-variant max-w-md">
+              Fund your testnet account with Friendbot to purchase tickets.
+            </p>
+          </div>
+          <a 
+            href="https://laboratory.stellar.org/#account-creator?network=testnet"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-primary-gradient px-8 py-3.5 rounded-xl text-white font-semibold flex items-center gap-2 cursor-pointer shrink-0"
+          >
+            <span className="material-symbols-outlined">waves</span>
+            Go to Friendbot
+          </a>
+        </section>
 
         {/* Smart Contract Configuration Form */}
         <section className="glass-card rounded-[32px] p-8">

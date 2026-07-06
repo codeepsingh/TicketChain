@@ -14,8 +14,7 @@ export const Navbar: React.FC = () => {
     walletConnected, 
     networkMode, 
     tokenBalance, 
-    disconnectWallet, 
-    setNetworkMode 
+    disconnectWallet 
   } = useTicketStore();
   
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -100,21 +99,7 @@ export const Navbar: React.FC = () => {
 
         {/* Mobile: Wallet Button (Top Right) | Desktop: Controls (Right) */}
         <div className="flex items-center gap-4">
-          {/* Network Switcher Toggle (Desktop Only) */}
-          <div className="hidden lg:flex items-center bg-surface-container-high rounded-full p-1 border border-white/5">
-            <button 
-              onClick={() => setNetworkMode('simulator')} 
-              className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${networkMode === 'simulator' ? 'bg-primary-container text-white' : 'text-on-surface-variant hover:text-on-surface'}`}
-            >
-              Sim
-            </button>
-            <button 
-              onClick={() => setNetworkMode('testnet')} 
-              className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${networkMode === 'testnet' ? 'bg-primary-container text-white' : 'text-on-surface-variant hover:text-on-surface'}`}
-            >
-              Testnet
-            </button>
-          </div>
+
 
           {!walletConnected && (
             <button 
@@ -139,16 +124,7 @@ export const Navbar: React.FC = () => {
                   <div className="px-3 py-2 text-xs text-on-surface-variant border-b border-white/5 mb-1">
                     Balance: <span className="text-secondary font-bold">{tokenBalance.toLocaleString()} XLM</span>
                   </div>
-                  {/* Network Toggler inside dropdown for Mobile View */}
-                  <div className="lg:hidden px-3 py-2 border-b border-white/5 mb-1 flex justify-between items-center text-[10px] text-on-surface-variant">
-                    <span>Network</span>
-                    <button 
-                      onClick={() => setNetworkMode(networkMode === 'simulator' ? 'testnet' : 'simulator')}
-                      className="text-secondary font-bold hover:underline"
-                    >
-                      {networkMode === 'simulator' ? 'Sim' : 'Testnet'}
-                    </button>
-                  </div>
+
                   <button 
                     onClick={handleDisconnect}
                     className="w-full text-left px-3 py-2 text-sm text-red-400 hover:bg-white/5 rounded-lg transition-colors flex items-center gap-2 cursor-pointer"
@@ -273,26 +249,7 @@ export const Navbar: React.FC = () => {
               </Link>
             </nav>
 
-            {/* Network Selector in Drawer */}
-            <div className="pt-6 border-t border-white/5 mt-auto flex flex-col gap-4">
-              <div className="flex justify-between items-center">
-                <span className="text-xs text-on-surface-variant">Stellar Network</span>
-                <div className="flex items-center bg-surface-container-high rounded-full p-1 border border-white/5">
-                  <button 
-                    onClick={() => setNetworkMode('simulator')} 
-                    className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${networkMode === 'simulator' ? 'bg-primary-container text-white' : 'text-on-surface-variant'}`}
-                  >
-                    Sim
-                  </button>
-                  <button 
-                    onClick={() => setNetworkMode('testnet')} 
-                    className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${networkMode === 'testnet' ? 'bg-primary-container text-white' : 'text-on-surface-variant'}`}
-                  >
-                    Testnet
-                  </button>
-                </div>
-              </div>
-            </div>
+
 
           </div>
         </div>
