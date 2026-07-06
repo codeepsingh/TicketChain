@@ -294,39 +294,43 @@ MIT License.
 
 ---
 
-# Screenshots
+## Screenshots
 
-### Wallet Connected
-![Wallet Connected Placeholder](/frontend/public/screenshots/wallet_connected.png)
+### Home Page
+<img width="1900" height="937" alt="image" src="https://github.com/user-attachments/assets/7032acd7-3e8a-4d81-8666-942d79f09a8b" />
 
-### Balance Display
-![Balance Display Placeholder](/frontend/public/screenshots/balance_display.png)
+### Wallet Connection
 
-### Contract Interaction
-![Contract Interaction Placeholder](/frontend/public/screenshots/contract_interaction.png)
+<img width="1903" height="932" alt="image" src="https://github.com/user-attachments/assets/3234be70-118f-4a06-a722-84015657b48f" />
 
-### Transaction Success
-![Transaction Success Placeholder](/frontend/public/screenshots/transaction_success.png)
+### Event Discovery
 
-### Event Creation
-![Event Creation Placeholder](/frontend/public/screenshots/event_creation.png)
+<img width="1901" height="931" alt="image" src="https://github.com/user-attachments/assets/33c246ca-e415-40de-8cfa-318ca780e6f0" />
+
+### Create Event
+
+<img width="1904" height="936" alt="image" src="https://github.com/user-attachments/assets/6b5c3e1f-960c-4855-830d-f800d24fe1dc" />
+
+### Event Details
+
+<img width="1898" height="914" alt="image" src="https://github.com/user-attachments/assets/0d632b86-4f41-4d33-bcd1-2750fca4f45d" />
 
 ### Ticket Purchase
-![Ticket Purchase Placeholder](/frontend/public/screenshots/ticket_purchase.png)
 
-### Ticket Verification
-![Ticket Verification Placeholder](/frontend/public/screenshots/ticket_verification.png)
+<img width="1906" height="934" alt="image" src="https://github.com/user-attachments/assets/8509d0c6-1cd7-4a22-929a-dc378e1bf568" />
 
-### Mobile View
-![Mobile View Placeholder](/frontend/public/screenshots/mobile_view.png)
+### My Tickets
+
+<img width="1892" height="933" alt="image" src="https://github.com/user-attachments/assets/4c6a11b8-e90d-4134-9024-e7a6f3e24019" />
+
+### Mobile Responsive View
+
+<img width="408" height="853" alt="image" src="https://github.com/user-attachments/assets/aa937a71-04ab-4462-b0ad-536a5dd646cc" />
 
 ### CI/CD Pipeline
-![CI/CD Pipeline Placeholder](/frontend/public/screenshots/cicd_pipeline.png)
 
-### Test Results
-![Test Results Placeholder](/frontend/public/screenshots/test_results.png)
+<img width="1904" height="974" alt="image" src="https://github.com/user-attachments/assets/50a4ec1a-6379-4cbf-8c78-3097e2d2b50e" />
 
----
 
 # Submission Details
 
@@ -334,4 +338,4 @@ MIT License.
 * **Live Demo**: [https://ticketchain1.netlify.app/](https://ticketchain1.netlify.app/)
 * **Contract Address**: `CC3TICKETMANAGER7TESTNET` (Manager), `CC3TICKETESCROW7TESTNET` (Escrow)
 * **Transaction Hash**: `a2b53f631df4cf17f7b3df634f192b45ccde7b1ca6e812d8a43690d7be2b65ac`
-* **Demo Video**: [https://youtube.com/watch?v=ticketchain_demo](https://youtube.com/watch?v=ticketchain_demo)
+* [**Demo Video**](https://drive.google.com/file/d/1_Ltp16UpzgmBLHGSJ4WrsaTswD3SjTDN/view?usp=sharing)
