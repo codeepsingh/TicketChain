@@ -4,9 +4,37 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="https://lh3.googleusercontent.com/aida-public/AB6AXuDhVq03uQjqvooBr87KGbqmjL2DnZ94xQ2jduFQQj8a_Q1AfuOkmG-FPBvBNNI3Yfp0eXqbPuazDhH5V2ut80ix_uvfR4PQDu10VbMyPA_z-co5G2cRF4BpduowcRPIrRQvSsTIPJ6AwmhG4wDMjZzL93o--hEyFNkCgDHgohBXtdjWKR5SJMHyHGMmg5N8r3e6MVFrp3M7bho9Si4wV2QcR0W1cVvBmfXAF_BkYc_rql73FHqk0V_0zexk48vsjTQWjlyk_0BQ0R19" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="TicketChain — Fraud-proof event ticketing powered by Stellar Soroban smart contracts. Create, buy, transfer and verify tickets on-chain." />
     <title>TicketChain - Fraud-Proof Event Ticketing on Stellar</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Sora:wght@400;600;700&amp;family=Syne:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+
+    <!-- ═══ Google Analytics 4 ══════════════════════════════════════════════ -->
+    <!-- Measurement ID is injected at build time via VITE_GA4_MEASUREMENT_ID -->
+    <!-- Replace G-XXXXXXXXXX with your real Measurement ID from GA4 console  -->
+    <script>
+      (function() {
+        var GA_ID = 'G-XXXXXXXXXX'; // ← REPLACE with real Measurement ID
+        if (!GA_ID || GA_ID === 'G-XXXXXXXXXX') {
+          console.info('[GA4] Measurement ID not configured. Analytics disabled.');
+          window.__GA_DISABLED__ = true;
+          return;
+        }
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){ dataLayer.push(arguments); }
+        window.gtag = gtag;
+        gtag('js', new Date());
+        gtag('config', GA_ID, {
+          send_page_view: false, // Manual page views via analytics.ts trackPageView()
+          cookie_flags: 'SameSite=None;Secure'
+        });
+        var s = document.createElement('script');
+        s.async = true;
+        s.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_ID;
+        document.head.appendChild(s);
+      })();
+    </script>
+    <!-- ════════════════════════════════════════════════════════════════════ -->
   </head>
   <body class="bg-[#131314] text-on-surface min-h-screen relative overflow-x-hidden antialiased">
     <!-- Ambient mesh background layers -->

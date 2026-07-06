@@ -1,6 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTicketStore } from '../store/useTicketStore';
 import { StellarService } from '../services/stellar';
+import {
+  trackEventCreated, trackTicketPurchased, trackTicketTransferred,
+  trackTicketVerified, trackEventCancelled, trackEventCompleted,
+  trackRefundClaimed, trackTransactionSuccess, trackTransactionFailed,
+} from '../utils/analytics';
+import { captureContractError } from '../utils/sentry';
 
 // ─────────────────────────────────────────────
 // useEvents — returns ONLY the events for the
@@ -89,6 +95,8 @@ export const useCreateEvent = () => {
           );
 
           store.updateTransaction(txId, 'confirmed', txHash);
+          trackEventCreated(params.name, params.price, params.maxTickets, txHash);
+          trackTransactionSuccess('create_event', txHash);
 
           // ── Store in TESTNET array only ──
           store.addTestnetEvent({
@@ -105,6 +113,8 @@ export const useCreateEvent = () => {
           return txHash;
         } catch (error: any) {
           store.updateTransaction(txId, 'failed');
+          trackTransactionFailed('create_event', error?.message || 'unknown');
+          captureContractError(error, 'create_event', store.managerContractId, store.walletAddress || undefined);
           throw error;
         }
       }
@@ -172,6 +182,8 @@ export const usePurchaseTicket = () => {
           );
 
           store.updateTransaction(txId, 'confirmed', txHash);
+          trackTicketPurchased(params.eventId, params.quantity, event.ticketPrice * params.quantity, txHash);
+          trackTransactionSuccess('purchase_ticket', txHash);
 
           // Store purchased tickets in TESTNET array
           const buyer = store.walletAddress;
@@ -193,6 +205,8 @@ export const usePurchaseTicket = () => {
           return txHash;
         } catch (error) {
           store.updateTransaction(txId, 'failed');
+          trackTransactionFailed('purchase_ticket', (error as any)?.message || 'unknown');
+          captureContractError(error, 'purchase_ticket', store.managerContractId, store.walletAddress || undefined);
           throw error;
         }
       }
@@ -245,6 +259,8 @@ export const useTransferTicket = () => {
           );
 
           store.updateTransaction(txId, 'confirmed', txHash);
+          trackTicketTransferred(params.ticketId, txHash);
+          trackTransactionSuccess('transfer_ticket', txHash);
           // Update testnet ticket owner locally
           store.addTestnetTickets(
             store.testnetTickets
@@ -260,6 +276,8 @@ export const useTransferTicket = () => {
           return txHash;
         } catch (error) {
           store.updateTransaction(txId, 'failed');
+          trackTransactionFailed('transfer_ticket', (error as any)?.message || 'unknown');
+          captureContractError(error, 'transfer_ticket', store.managerContractId, store.walletAddress || undefined);
           throw error;
         }
       }
@@ -310,6 +328,8 @@ export const useVerifyTicket = () => {
           );
 
           store.updateTransaction(txId, 'confirmed', txHash);
+          trackTicketVerified(params.ticketId, txHash);
+          trackTransactionSuccess('verify_ticket', txHash);
           store.updateTestnetTicketVerified(params.ticketId);
 
           store.addActivity({
@@ -320,6 +340,8 @@ export const useVerifyTicket = () => {
           return txHash;
         } catch (error) {
           store.updateTransaction(txId, 'failed');
+          trackTransactionFailed('verify_ticket', (error as any)?.message || 'unknown');
+          captureContractError(error, 'verify_ticket', store.managerContractId, store.walletAddress || undefined);
           throw error;
         }
       }
@@ -370,6 +392,8 @@ export const useCancelEvent = () => {
           );
 
           store.updateTransaction(txId, 'confirmed', txHash);
+          trackEventCancelled(params.eventId, txHash);
+          trackTransactionSuccess('cancel_event', txHash);
           store.addActivity({
             type: 'event_cancelled',
             details: `Event #${params.eventId} cancelled on Testnet`,
@@ -378,6 +402,8 @@ export const useCancelEvent = () => {
           return txHash;
         } catch (error) {
           store.updateTransaction(txId, 'failed');
+          trackTransactionFailed('cancel_event', (error as any)?.message || 'unknown');
+          captureContractError(error, 'cancel_event', store.managerContractId, store.walletAddress || undefined);
           throw error;
         }
       }
@@ -429,6 +455,8 @@ export const useClaimRefund = () => {
           );
 
           store.updateTransaction(txId, 'confirmed', txHash);
+          trackRefundClaimed(params.eventId, params.ticketId, txHash);
+          trackTransactionSuccess('claim_refund', txHash);
           store.addActivity({
             type: 'funds_withdrawn',
             details: `Refund claimed for Ticket #${params.ticketId} on Testnet`,
@@ -487,6 +515,8 @@ export const useCompleteEvent = () => {
           );
 
           store.updateTransaction(txId, 'confirmed', txHash);
+          trackEventCompleted(params.eventId, txHash);
+          trackTransactionSuccess('complete_event', txHash);
           store.addActivity({
             type: 'event_completed',
             details: `Event #${params.eventId} completed on Testnet`,

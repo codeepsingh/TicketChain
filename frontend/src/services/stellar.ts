@@ -17,6 +17,8 @@ import {
   signTransaction as signFreighterTransaction,
 } from '@stellar/freighter-api';
 import { useTicketStore } from '../store/useTicketStore';
+import { trackWalletConnected, trackWalletDisconnected, trackError } from '../utils/analytics';
+import { captureWalletError } from '../utils/sentry';
 
 // Testnet configurations
 export const TESTNET_RPC_URL = 'https://soroban-testnet.stellar.org';
@@ -346,21 +348,26 @@ export const connectStellarWallet = async (networkMode: 'simulator' | 'testnet')
     // Simulator connection: mock address
     const randomSimulatorAddress = 'GC' + Math.random().toString(36).substr(2, 9).toUpperCase() + 'SIMULATED';
     store.connectWallet(randomSimulatorAddress, 'Freighter (Sim)');
+    trackWalletConnected(randomSimulatorAddress, 'Freighter (Sim)');
   } else {
     try {
       const status = await isFreighterConnected();
       if (!status.isConnected) {
         alert('Freighter wallet extension is not installed.');
+        trackError('wallet', 'Freighter not installed');
         return;
       }
       const { address } = await requestFreighterAccess();
       if (address) {
         store.connectWallet(address, 'Freighter');
+        trackWalletConnected(address, 'Freighter');
       } else {
         throw new Error('No address returned from Freighter.');
       }
     } catch (error) {
       console.error('Wallet connection failed:', error);
+      captureWalletError(error);
+      trackError('wallet', (error as any)?.message || 'Wallet connection failed');
       alert('Could not connect wallet. Make sure Freighter is installed and unlocked.');
     }
   }

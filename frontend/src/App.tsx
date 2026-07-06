@@ -1,11 +1,13 @@
 import React, { useEffect } from 'react';
-import { HashRouter, Routes, Route } from 'react-router-dom';
+import { HashRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { TransactionFeed } from './components/TransactionFeed';
 import { streamLedgerEvents, StellarService } from './services/stellar';
 import { useTicketStore } from './store/useTicketStore';
+import { trackPageView } from './utils/analytics';
+import { setSentryUser } from './utils/sentry';
 
 // Pages
 import { LandingPage } from './pages/LandingPage';
@@ -28,7 +30,9 @@ const queryClient = new QueryClient({
   },
 });
 
-const App: React.FC = () => {
+// ── Inner app: has access to router context for location tracking ──
+const AppInner: React.FC = () => {
+  const location = useLocation();
   const { 
     managerContractId, 
     escrowContractId, 
@@ -41,6 +45,16 @@ const App: React.FC = () => {
     purgeInvalidTestnetEvents,
     setNetworkMode,
   } = useTicketStore();
+
+  // ── Track page views on every route change ──
+  useEffect(() => {
+    trackPageView(location.pathname, document.title);
+  }, [location.pathname]);
+
+  // ── Sync Sentry user context with wallet state ──
+  useEffect(() => {
+    setSentryUser(walletConnected ? walletAddress : null);
+  }, [walletAddress, walletConnected]);
 
   // ── On mount: sanitize stored config & force testnet mode ──
   useEffect(() => {
@@ -109,32 +123,37 @@ const App: React.FC = () => {
   }, [walletAddress, walletConnected, networkMode, updateTokenBalance]);
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <HashRouter>
-        <div className="flex flex-col min-h-screen">
-          <Navbar />
-          
-          <div className="flex-grow">
-            <Routes>
-              <Route path="/" element={<LandingPage />} />
-              <Route path="/events" element={<ExplorePage />} />
-              <Route path="/create-event" element={<CreateEventPage />} />
-              <Route path="/dashboard" element={<UserDashboardPage />} />
-              <Route path="/dashboard/organizer" element={<OrganizerDashboardPage />} />
-              <Route path="/my-tickets" element={<MyTicketsPage />} />
-              <Route path="/tickets/:id" element={<TicketDetailsPage />} />
-              <Route path="/verify" element={<VerifyPage />} />
-              <Route path="/profile" element={<ProfilePage />} />
-              <Route path="/settings" element={<SettingsPage />} />
-            </Routes>
-          </div>
-          
-          <Footer />
-          <TransactionFeed />
-        </div>
-      </HashRouter>
-    </QueryClientProvider>
+    <div className="flex flex-col min-h-screen">
+      <Navbar />
+      
+      <div className="flex-grow">
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/events" element={<ExplorePage />} />
+          <Route path="/create-event" element={<CreateEventPage />} />
+          <Route path="/dashboard" element={<UserDashboardPage />} />
+          <Route path="/dashboard/organizer" element={<OrganizerDashboardPage />} />
+          <Route path="/my-tickets" element={<MyTicketsPage />} />
+          <Route path="/tickets/:id" element={<TicketDetailsPage />} />
+          <Route path="/verify" element={<VerifyPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/settings" element={<SettingsPage />} />
+        </Routes>
+      </div>
+      
+      <Footer />
+      <TransactionFeed />
+    </div>
   );
 };
+
+// ── Root app wrapped in providers ──
+const App: React.FC = () => (
+  <QueryClientProvider client={queryClient}>
+    <HashRouter>
+      <AppInner />
+    </HashRouter>
+  </QueryClientProvider>
+);
 
 export default App;

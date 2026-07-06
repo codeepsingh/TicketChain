@@ -24,6 +24,16 @@ export const Footer: React.FC = () => {
           <a className="font-body-md text-body-md text-on-surface-variant hover:text-secondary transition-colors" href="#">About</a>
           <a className="font-body-md text-body-md text-on-surface-variant hover:text-secondary transition-colors" href="#">Press</a>
           <a className="font-body-md text-body-md text-on-surface-variant hover:text-secondary transition-colors" href="#">Contact</a>
+          <a
+            className="font-body-md text-body-md text-secondary hover:text-primary transition-colors flex items-center gap-1"
+            href="https://forms.gle/REPLACE_WITH_REAL_FORM_ID"
+            id="footer-feedback-link"
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            <span className="material-symbols-outlined text-[14px]">rate_review</span>
+            Share Feedback
+          </a>
         </div>
         <div className="flex flex-col gap-3">
           <h4 className="font-label-sm text-label-sm text-on-surface mb-2">Legal</h4>
