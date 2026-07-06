@@ -209,7 +209,7 @@ export class StellarService {
     }
 
     // 4. Assemble the transaction with resources and simulated fees
-    const assembledTx = rpc.assembleTransaction(tx, simulation) as any as Transaction;
+    const assembledTx = rpc.assembleTransaction(tx, simulation).build();
 
     // 5. Retrieve base64 transaction XDR to sign
     const txXdr = assembledTx.toXDR();
