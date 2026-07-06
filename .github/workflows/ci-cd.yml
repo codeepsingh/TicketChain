@@ -79,7 +79,7 @@ jobs:
         run: |
           if [ -z "${{ secrets.NETLIFY_AUTH_TOKEN }}" ] || [ -z "${{ secrets.NETLIFY_SITE_ID }}" ]; then
             echo "::warning::Netlify credentials (NETLIFY_AUTH_TOKEN or NETLIFY_SITE_ID) are not configured. Skipping deployment."
-            echo "deploy_url=https://ticketchain-stellar.netlify.app" >> $GITHUB_OUTPUT
+            echo "deploy_url=https://ticketchain1.netlify.app" >> $GITHUB_OUTPUT
             exit 0
           fi
           npm install netlify-cli
@@ -87,7 +87,7 @@ jobs:
           echo "$DEPLOY_OUTPUT"
           URL=$(echo "$DEPLOY_OUTPUT" | grep -oE "https://[a-zA-Z0-9-]+\.netlify\.app" | head -n 1)
           if [ -z "$URL" ]; then
-            URL="https://ticketchain-stellar.netlify.app"
+            URL="https://ticketchain1.netlify.app"
           fi
           echo "deploy_url=$URL" >> $GITHUB_OUTPUT
         env:

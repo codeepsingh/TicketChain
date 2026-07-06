@@ -1,8 +1,8 @@
 # TicketChain
 
 [![Build Status](https://img.shields.io/github/actions/workflow/status/codeepsingh/TicketChain/ci-cd.yml?branch=main&style=for-the-badge&logo=github&label=Build)](https://github.com/codeepsingh/TicketChain/actions)
-[![Deployment Status](https://img.shields.io/badge/Netlify-Deployed-success?style=for-the-badge&color=25C2A0&logo=netlify)](https://ticketchain-stellar.netlify.app)
-[![Live Demo](https://img.shields.io/badge/Demo-Live-gold?style=for-the-badge&logo=stellar)](https://ticketchain-stellar.netlify.app)
+[![Deployment Status](https://img.shields.io/badge/Netlify-Deployed-success?style=for-the-badge&color=25C2A0&logo=netlify)](https://ticketchain1.netlify.app/)
+[![Live Demo](https://img.shields.io/badge/Demo-Live-gold?style=for-the-badge&logo=stellar)](https://ticketchain1.netlify.app/)
 [![GitHub Stars](https://img.shields.io/github/stars/codeepsingh/TicketChain?style=for-the-badge&logo=github)](https://github.com/codeepsingh/TicketChain/stargazers)
 [![Latest Commit](https://img.shields.io/github/last-commit/codeepsingh/TicketChain?style=for-the-badge&logo=git)](https://github.com/codeepsingh/TicketChain/commits/main)
 [![License](https://img.shields.io/github/license/codeepsingh/TicketChain?style=for-the-badge&color=blue)](https://github.com/codeepsingh/TicketChain)
@@ -331,7 +331,7 @@ MIT License.
 # Submission Details
 
 * **GitHub Repository**: [https://github.com/codeepsingh/ticketchain1](https://github.com/codeepsingh/ticketchain1)
-* **Live Demo**: [https://ticketchain-stellar.netlify.app/](https://ticketchain-stellar.netlify.app/)
+* **Live Demo**: [https://ticketchain1.netlify.app/](https://ticketchain1.netlify.app/)
 * **Contract Address**: `CC3TICKETMANAGER7TESTNET` (Manager), `CC3TICKETESCROW7TESTNET` (Escrow)
 * **Transaction Hash**: `a2b53f631df4cf17f7b3df634f192b45ccde7b1ca6e812d8a43690d7be2b65ac`
 * **Demo Video**: [https://youtube.com/watch?v=ticketchain_demo](https://youtube.com/watch?v=ticketchain_demo)

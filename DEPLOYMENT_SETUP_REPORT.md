@@ -46,7 +46,7 @@ graph TD
 * **Build Location**: `frontend/dist`
 * **Netlify Auth Token**: Configured as `${{ secrets.NETLIFY_AUTH_TOKEN }}` in GitHub Secrets.
 * **Netlify Site ID**: Configured as `${{ secrets.NETLIFY_SITE_ID }}` in GitHub Secrets.
-* **Production Deployment URL**: [https://ticketchain-stellar.netlify.app](https://ticketchain-stellar.netlify.app)
+* **Production Deployment URL**: [https://ticketchain1.netlify.app/](https://ticketchain1.netlify.app/)
 * **Local CLI Build**: Done via `npx netlify deploy --prod` (ensuring sandbox compilation matches Netlify's build matrix).
 
 ---
