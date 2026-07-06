@@ -70,7 +70,7 @@ export const useCreateEvent = () => {
         
         try {
           store.updateTransaction(txId, 'processing');
-          const txHash = await StellarService.createEvent(
+          const { txHash, eventId } = await StellarService.createEvent(
             store.managerContractId,
             store.walletAddress,
             params.name,
@@ -80,7 +80,7 @@ export const useCreateEvent = () => {
           );
           
           store.updateTransaction(txId, 'confirmed', txHash);
-          store.simCreateEvent(params.name, params.price, params.maxTickets, params.date);
+          store.simCreateEvent(params.name, params.price, params.maxTickets, params.date, eventId);
           
           return txHash;
         } catch (error: any) {
@@ -123,6 +123,12 @@ export const usePurchaseTicket = () => {
       } else {
         if (!store.walletAddress) throw new Error('Wallet not connected');
         
+        // Prevent purchasing mock/default events on Testnet
+        const targetEvent = store.events.find(e => e.id === params.eventId);
+        if (targetEvent && !targetEvent.onChain) {
+          throw new Error('Default simulator events do not exist on the Testnet contract. Please switch Network Mode to "Sim" to test with mock events, or "Create Event" on Testnet to buy live tickets!');
+        }
+
         store.addTransaction({
           id: txId,
           label: `Stellar Soroban: Purchase Tickets`,

@@ -73,19 +73,18 @@ export const Navbar: React.FC = () => {
     <nav className="fixed top-0 w-full z-50 bg-surface/10 backdrop-blur-xl border-b border-white/5 shadow-[0_8px_32px_0_rgba(92,10,24,0.15)]">
       <div className="flex justify-between items-center px-margin-mobile lg:px-margin-desktop py-4 max-w-container-max mx-auto relative min-h-[72px]">
         
-        {/* Mobile: Hamburger Button (Top Left) */}
-        <button 
-          onClick={() => setMobileMenuOpen(true)}
-          className="lg:hidden text-on-surface p-2 focus:outline-none flex items-center justify-center cursor-pointer"
-          aria-label="Open Menu"
-        >
-          <span className="material-symbols-outlined text-[28px]">menu</span>
-        </button>
+        {/* Mobile: Hamburger + Logo Group (Left) */}
+        <div className="flex items-center gap-1 lg:gap-0 z-10">
+          <button 
+            onClick={() => setMobileMenuOpen(true)}
+            className="lg:hidden text-on-surface p-1.5 focus:outline-none flex items-center justify-center cursor-pointer"
+            aria-label="Open Menu"
+          >
+            <span className="material-symbols-outlined text-[28px]">menu</span>
+          </button>
 
-        {/* Mobile: Logo (Top Center) | Desktop: Logo (Left) */}
-        <div className="absolute left-1/2 -translate-x-1/2 lg:static lg:translate-x-0 lg:left-auto">
           <Link to="/" className="flex items-center gap-2">
-            <span className="font-headline-lg-mobile text-headline-lg-mobile lg:font-headline-lg lg:text-headline-lg font-bold tracking-tight text-on-surface">TicketChain</span>
+            <span className="font-headline-lg-mobile text-lg xs:text-xl sm:text-headline-lg-mobile lg:font-headline-lg lg:text-headline-lg font-bold tracking-tight text-on-surface">TicketChain</span>
           </Link>
         </div>
 

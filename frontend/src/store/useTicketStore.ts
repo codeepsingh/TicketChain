@@ -10,6 +10,7 @@ export interface EventInfo {
   soldTickets: number;
   date: number; // Unix timestamp
   status: 0 | 1 | 2; // 0: Open, 1: Cancelled, 2: Completed
+  onChain?: boolean;
 }
 
 export interface TicketInfo {
@@ -68,7 +69,7 @@ interface TicketStore {
   addActivity: (activity: Omit<LedgerActivity, 'id' | 'timestamp' | 'txHash'>) => void;
 
   // Simulator Mutation Actions (Fallback for simulator mode)
-  simCreateEvent: (name: string, price: number, maxTickets: number, date: number) => number;
+  simCreateEvent: (name: string, price: number, maxTickets: number, date: number, forcedId?: number) => number;
   simPurchaseTicket: (eventId: number, quantity: number) => void;
   simTransferTicket: (ticketId: number, toAddress: string) => void;
   simVerifyTicket: (ticketId: number) => void;
@@ -120,8 +121,9 @@ export const useTicketStore = create<TicketStore>()(
       walletName: null,
       networkMode: 'testnet',
       tokenBalance: 0, // Initial balance starts at 0 for actual wallets
-      managerContractId: 'CC3TICKETMANAGER...TESTNET',
-      escrowContractId: 'CC3TICKETESCROW...TESTNET',
+      managerContractId: import.meta.env.VITE_TICKET_MANAGER_CONTRACT || 'CA5PG7SDYI7X6AJMRBX6DZL5LA4YT5I7WECPH347FDSSOBDU73GUZ76O',
+      escrowContractId: import.meta.env.VITE_TICKET_ESCROW_CONTRACT || 'CCHIMKSGFIOLMENQCLWSADERPFKFSMTLOWTWUYARBE6J4FGS6BKSY3S3',
+
 
       events: defaultEvents,
       tickets: [],
@@ -242,9 +244,9 @@ export const useTicketStore = create<TicketStore>()(
       },
 
       // Simulator mutations
-      simCreateEvent: (name, price, maxTickets, date) => {
+      simCreateEvent: (name, price, maxTickets, date, forcedId) => {
         const organizer = get().walletAddress || 'G_SIMULATED_USER...TESTNET';
-        const newId = get().events.length + 1;
+        const newId = forcedId !== undefined ? forcedId : get().events.length + 1;
         const newEvent: EventInfo = {
           id: newId,
           organizer,
@@ -254,6 +256,7 @@ export const useTicketStore = create<TicketStore>()(
           soldTickets: 0,
           date,
           status: 0,
+          onChain: get().networkMode === 'testnet',
         };
 
         set((state) => ({

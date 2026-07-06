@@ -9,12 +9,13 @@ import {
   BASE_FEE,
   Transaction,
   nativeToScVal,
+  scValToNative,
 } from '@stellar/stellar-sdk';
 import {
-  StellarWalletsKit,
-  Networks as WalletNetworks,
-} from '@creit.tech/stellar-wallets-kit';
-import { defaultModules } from '@creit.tech/stellar-wallets-kit/modules/utils';
+  isConnected as isFreighterConnected,
+  requestAccess as requestFreighterAccess,
+  signTransaction as signFreighterTransaction,
+} from '@stellar/freighter-api';
 import { useTicketStore } from '../store/useTicketStore';
 
 // Testnet configurations
@@ -23,19 +24,6 @@ export const TESTNET_HORIZON_URL = 'https://horizon-testnet.stellar.org';
 
 export const rpcServer = new rpc.Server(TESTNET_RPC_URL);
 export const horizonServer = new Horizon.Server(TESTNET_HORIZON_URL);
-
-let walletKitInitialized = false;
-
-export const initWalletKit = (): void => {
-  if (typeof window === 'undefined') return;
-  if (!walletKitInitialized) {
-    StellarWalletsKit.init({
-      network: WalletNetworks.TESTNET,
-      modules: defaultModules(),
-    });
-    walletKitInitialized = true;
-  }
-};
 
 export class StellarService {
   /**
@@ -62,7 +50,7 @@ export class StellarService {
     ticketPrice: number,
     maxTickets: number,
     date: number
-  ): Promise<string> {
+  ): Promise<{ txHash: string; eventId: number }> {
     const params = [
       Address.fromString(signerAddress).toScVal(),
       nativeToScVal(name, { type: 'string' }),
@@ -71,7 +59,16 @@ export class StellarService {
       nativeToScVal(BigInt(date), { type: 'u64' }),
     ];
 
-    return this.invokeContract(contractId, signerAddress, 'create_event', params);
+    const { txHash, returnValue } = await this.invokeContract(contractId, signerAddress, 'create_event', params);
+    let eventId = 0;
+    if (returnValue) {
+      try {
+        eventId = Number(scValToNative(returnValue));
+      } catch (err) {
+        console.error('Error decoding eventId from returnValue:', err);
+      }
+    }
+    return { txHash, eventId };
   }
 
   /**
@@ -89,7 +86,8 @@ export class StellarService {
       nativeToScVal(quantity, { type: 'u32' }),
     ];
 
-    return this.invokeContract(contractId, signerAddress, 'purchase_ticket', params);
+    const { txHash } = await this.invokeContract(contractId, signerAddress, 'purchase_ticket', params);
+    return txHash;
   }
 
   /**
@@ -107,7 +105,8 @@ export class StellarService {
       Address.fromString(toAddress).toScVal(),
     ];
 
-    return this.invokeContract(contractId, signerAddress, 'transfer_ticket', params);
+    const { txHash } = await this.invokeContract(contractId, signerAddress, 'transfer_ticket', params);
+    return txHash;
   }
 
   /**
@@ -123,7 +122,8 @@ export class StellarService {
       Address.fromString(signerAddress).toScVal(),
     ];
 
-    return this.invokeContract(contractId, signerAddress, 'verify_ticket', params);
+    const { txHash } = await this.invokeContract(contractId, signerAddress, 'verify_ticket', params);
+    return txHash;
   }
 
   /**
@@ -139,7 +139,8 @@ export class StellarService {
       Address.fromString(signerAddress).toScVal(),
     ];
 
-    return this.invokeContract(contractId, signerAddress, 'cancel_event', params);
+    const { txHash } = await this.invokeContract(contractId, signerAddress, 'cancel_event', params);
+    return txHash;
   }
 
   /**
@@ -155,7 +156,8 @@ export class StellarService {
       Address.fromString(signerAddress).toScVal(),
     ];
 
-    return this.invokeContract(contractId, signerAddress, 'complete_event', params);
+    const { txHash } = await this.invokeContract(contractId, signerAddress, 'complete_event', params);
+    return txHash;
   }
 
   /**
@@ -173,7 +175,8 @@ export class StellarService {
       Address.fromString(signerAddress).toScVal(),
     ];
 
-    return this.invokeContract(contractId, signerAddress, 'claim_refund', params);
+    const { txHash } = await this.invokeContract(contractId, signerAddress, 'claim_refund', params);
+    return txHash;
   }
 
   /**
@@ -184,8 +187,7 @@ export class StellarService {
     signerAddress: string,
     method: string,
     params: xdr.ScVal[]
-  ): Promise<string> {
-    initWalletKit();
+  ): Promise<{ txHash: string; returnValue?: xdr.ScVal }> {
     const contract = new Contract(contractId);
 
     // 1. Fetch account information from Horizon
@@ -212,11 +214,19 @@ export class StellarService {
     // 5. Retrieve base64 transaction XDR to sign
     const txXdr = assembledTx.toXDR();
 
-    // 6. Sign using StellarWalletsKit
-    const { signedTxXdr } = await StellarWalletsKit.signTransaction(txXdr, {
-      address: signerAddress,
+    // 6. Sign using Freighter directly
+    const { signedTxXdr, error } = await signFreighterTransaction(txXdr, {
       networkPassphrase: StellarNetworks.TESTNET,
+      address: signerAddress,
     });
+
+    if (error) {
+      throw new Error(`Freighter transaction signing failed: ${error}`);
+    }
+
+    if (!signedTxXdr) {
+      throw new Error('No signed transaction XDR returned from Freighter.');
+    }
 
     // 7. Re-wrap the signed transaction XDR
     const signedTx = new Transaction(signedTxXdr, StellarNetworks.TESTNET);
@@ -238,7 +248,10 @@ export class StellarService {
       status = statusCheck.status as string;
       
       if (status === 'SUCCESS') {
-        return txHash;
+        return {
+          txHash,
+          returnValue: (statusCheck as any).returnValue,
+        };
       }
       if (status === 'FAILED') {
         throw new Error(`Transaction ${txHash} failed on-chain.`);
@@ -250,11 +263,17 @@ export class StellarService {
       throw new Error(`Transaction ${txHash} timed out (still pending).`);
     }
 
-    return txHash;
+    return { txHash };
   }
 }
 
+let activeStreamClose: (() => void) | null = null;
+
 export const streamLedgerEvents = (contractId: string, onEvent: (event: any) => void) => {
+  if (activeStreamClose) {
+    activeStreamClose();
+  }
+
   let isClosed = false;
   let lastLedger: number | null = null;
 
@@ -294,8 +313,15 @@ export const streamLedgerEvents = (contractId: string, onEvent: (event: any) => 
 
   poll();
 
-  return () => {
+  activeStreamClose = () => {
     isClosed = true;
+  };
+
+  return () => {
+    if (activeStreamClose) {
+      activeStreamClose();
+      activeStreamClose = null;
+    }
   };
 };
 
@@ -307,10 +333,16 @@ export const connectStellarWallet = async (networkMode: 'simulator' | 'testnet')
     store.connectWallet(randomSimulatorAddress, 'Freighter (Sim)');
   } else {
     try {
-      initWalletKit();
-      const { address } = await StellarWalletsKit.authModal();
+      const status = await isFreighterConnected();
+      if (!status.isConnected) {
+        alert('Freighter wallet extension is not installed.');
+        return;
+      }
+      const { address } = await requestFreighterAccess();
       if (address) {
         store.connectWallet(address, 'Freighter');
+      } else {
+        throw new Error('No address returned from Freighter.');
       }
     } catch (error) {
       console.error('Wallet connection failed:', error);
