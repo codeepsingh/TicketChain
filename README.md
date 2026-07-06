@@ -475,6 +475,37 @@ npx netlify deploy --dir=dist --prod
 
 ---
 
+## Screenshots
+
+### Home Page
+<img width="1900" height="937" alt="Home Page" src="https://github.com/user-attachments/assets/7032acd7-3e8a-4d81-8666-942d79f09a8b" />
+
+### Wallet Connection
+<img width="1903" height="932" alt="Wallet Connection" src="https://github.com/user-attachments/assets/3234be70-118f-4a06-a722-84015657b48f" />
+
+### Event Discovery
+<img width="1901" height="931" alt="Event Discovery" src="https://github.com/user-attachments/assets/33c246ca-e415-40de-8cfa-318ca780e6f0" />
+
+### Create Event
+<img width="1904" height="936" alt="Create Event" src="https://github.com/user-attachments/assets/6b5c3e1f-960c-4855-830d-f800d24fe1dc" />
+
+### Event Details
+<img width="1898" height="914" alt="Event Details" src="https://github.com/user-attachments/assets/0d632b86-4f41-4d33-bcd1-2750fca4f45d" />
+
+### Ticket Purchase
+<img width="1906" height="934" alt="Ticket Purchase" src="https://github.com/user-attachments/assets/8509d0c6-1cd7-4a22-929a-dc378e1bf568" />
+
+### My Tickets
+<img width="1892" height="933" alt="My Tickets" src="https://github.com/user-attachments/assets/4c6a11b8-e90d-4134-9024-e7a6f3e24019" />
+
+### Mobile Responsive View
+<img width="408" height="853" alt="Mobile Responsive View" src="https://github.com/user-attachments/assets/aa937a71-04ab-4462-b0ad-536a5dd646cc" />
+
+### CI/CD Pipeline
+<img width="1904" height="974" alt="CI/CD Pipeline" src="https://github.com/user-attachments/assets/50a4ec1a-6379-4cbf-8c78-3097e2d2b50e" />
+
+---
+
 ## Security
 
 | Layer | Mechanism |
