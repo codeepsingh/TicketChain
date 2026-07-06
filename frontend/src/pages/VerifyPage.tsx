@@ -224,6 +224,7 @@ export const VerifyPage: React.FC = () => {
           )}
         </div>
       </div>
+      )}
     </main>
   );
 };

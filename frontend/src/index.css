@@ -242,3 +242,21 @@ body {
 .hover\:rotate-x-0:hover {
   transform: rotateX(0deg);
 }
+
+@keyframes slideRight {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}

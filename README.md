@@ -1,5 +1,12 @@
 # TicketChain
 
+[![Build Status](https://img.shields.io/github/actions/workflow/status/codeepsingh/TicketChain/ci-cd.yml?branch=main&style=for-the-badge&logo=github&label=Build)](https://github.com/codeepsingh/TicketChain/actions)
+[![Deployment Status](https://img.shields.io/badge/Netlify-Deployed-success?style=for-the-badge&color=25C2A0&logo=netlify)](https://ticketchain-stellar.netlify.app)
+[![Live Demo](https://img.shields.io/badge/Demo-Live-gold?style=for-the-badge&logo=stellar)](https://ticketchain-stellar.netlify.app)
+[![GitHub Stars](https://img.shields.io/github/stars/codeepsingh/TicketChain?style=for-the-badge&logo=github)](https://github.com/codeepsingh/TicketChain/stargazers)
+[![Latest Commit](https://img.shields.io/github/last-commit/codeepsingh/TicketChain?style=for-the-badge&logo=git)](https://github.com/codeepsingh/TicketChain/commits/main)
+[![License](https://img.shields.io/github/license/codeepsingh/TicketChain?style=for-the-badge&color=blue)](https://github.com/codeepsingh/TicketChain)
+
 ### Fraud-Proof Event Ticketing on Stellar
 
 TicketChain is a decentralized ticket management platform built on the Stellar network using Soroban smart contracts. It guarantees secure, verifiable, and transferable event tickets, preventing double-spending and fraud at the gate.
