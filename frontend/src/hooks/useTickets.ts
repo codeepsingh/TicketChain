@@ -11,9 +11,9 @@ export const useEvents = () => {
       if (networkMode === 'simulator') {
         return events;
       }
-      return events;
+      return events.filter((e) => e.onChain === true);
     },
-    initialData: events,
+    initialData: networkMode === 'simulator' ? events : events.filter((e) => e.onChain === true),
   });
 };
 
