@@ -570,7 +570,9 @@ Seven layers of error handling are implemented throughout the application:
 - [x] Real-world usefulness demonstrated (3 verified fraud problems solved)
 - [x] Analytics integration (GA4 — `utils/analytics.ts`, `index.html`)
 - [x] Monitoring integration (Sentry — `utils/sentry.ts`, all catch blocks)
-- [ ] 10 real users onboarded *(recruit via live demo link)*
+- [x] User feedback form live — [forms.gle/rEqPJBhhWUYEzKwn8](https://forms.gle/rEqPJBhhWUYEzKwn8)
+- [x] User response sheet — [Google Sheets](https://docs.google.com/spreadsheets/d/1npaYhDGRERXpIrefOv3p3cNlz5qk8A08gxf5UbDEMts/edit?usp=sharing)
+- [ ] 10 real users onboarded *(share form above with 10 people)*
 - [ ] Demo video *(record 60-90 sec screen capture and add URL below)*
 
 ---
@@ -585,6 +587,17 @@ Seven layers of error handling are implemented throughout the application:
 | **Manager Contract** | [`CA5PG7SDYI7X6AJMRBX6DZL5LA4YT5I7WECPH347FDSSOBDU73GUZ76O`](https://stellar.expert/explorer/testnet/contract/CA5PG7SDYI7X6AJMRBX6DZL5LA4YT5I7WECPH347FDSSOBDU73GUZ76O) |
 | **Escrow Contract** | [`CCHIMKSGFIOLMENQCLWSADERPFKFSMTLOWTWUYARBE6J4FGS6BKSY3S3`](https://stellar.expert/explorer/testnet/contract/CCHIMKSGFIOLMENQCLWSADERPFKFSMTLOWTWUYARBE6J4FGS6BKSY3S3) |
 | **Demo Video** | *(Add YouTube URL after recording)* |
+| **User Feedback Form** | [forms.gle/rEqPJBhhWUYEzKwn8](https://forms.gle/rEqPJBhhWUYEzKwn8) |
+| **User Response Sheet** | [View on Google Sheets](https://docs.google.com/spreadsheets/d/1npaYhDGRERXpIrefOv3p3cNlz5qk8A08gxf5UbDEMts/edit?usp=sharing) |
+
+### User Feedback
+
+We actively collect structured feedback from real users to improve the platform:
+
+- 📝 **Feedback Form** — [https://forms.gle/rEqPJBhhWUYEzKwn8](https://forms.gle/rEqPJBhhWUYEzKwn8)
+- 📊 **Live Response Sheet** — [Google Sheets](https://docs.google.com/spreadsheets/d/1npaYhDGRERXpIrefOv3p3cNlz5qk8A08gxf5UbDEMts/edit?usp=sharing)
+
+The form collects feedback on wallet onboarding experience, ticket purchase flow, UI clarity, and overall satisfaction. All responses are logged in real time in the linked spreadsheet.
 
 ---
 
