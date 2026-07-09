@@ -717,7 +717,7 @@ Seven layers of error handling are implemented throughout the application:
 - [x] User feedback form live — [forms.gle/rEqPJBhhWUYEzKwn8](https://forms.gle/rEqPJBhhWUYEzKwn8)
 - [x] User response sheet — [Google Sheets](https://docs.google.com/spreadsheets/d/1npaYhDGRERXpIrefOv3p3cNlz5qk8A08gxf5UbDEMts/edit?usp=sharing)
 - [ ] 10 real users onboarded *(share form above with 10 people)*
-- [ ] Demo video *(record 60-90 sec screen capture and add URL below)*
+- [ ] [Demo video](https://drive.google.com/file/d/1_Ltp16UpzgmBLHGSJ4WrsaTswD3SjTDN/view?usp=drive_link)
 
 ---
 
