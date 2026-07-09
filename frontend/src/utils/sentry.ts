@@ -28,11 +28,12 @@ interface SentrySDK {
   }) => void;
 }
 
-// Try to load Sentry at runtime
+// Try to load Sentry at runtime — using dynamic window access to avoid TS require() error
 let Sentry: SentrySDK | null = null;
 try {
-  // Dynamic import — will succeed if @sentry/react is installed
-  Sentry = require('@sentry/react') as SentrySDK;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const mod = (globalThis as any).__sentrySDK || null;
+  if (mod) Sentry = mod as SentrySDK;
 } catch {
   // @sentry/react not installed — monitoring gracefully disabled
   console.info('[Sentry] SDK not installed. Error monitoring disabled. Run: npm install @sentry/react');

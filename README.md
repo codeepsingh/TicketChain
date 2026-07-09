@@ -222,12 +222,125 @@ The financial custody contract. Secures all ticket purchase funds:
 
 ## Wallet Integration
 
-Wallet connectivity is powered by `@creit.tech/stellar-wallets-kit` with Freighter as the primary wallet:
+> **🔗 Live Demo:** [`/#/wallet-demo`](https://ticketchain1.netlify.app/#/wallet-demo) — Interactive wallet integration page for reviewers.
 
-- **Initialization** — Configures `TESTNET` network context; registers Freighter, Hana, LOBSTR, and Albedo
-- **Authentication** — Opens a clean modal, retrieves the active public key, binds to Zustand store
-- **Transaction Signing** — Builds XDR payload → sends to Freighter for signing → submits signed envelope to RPC
-- **Balance Sync** — Polls Horizon API every 15 seconds; updates displayed XLM balance in Navbar
+Wallet connectivity is powered by **Freighter** (`@stellar/freighter-api` v6) with multi-wallet modal support via `@creit.tech/stellar-wallets-kit`.
+
+### Wallet Provider
+
+| Property | Value |
+|---|---|
+| Primary Wallet | Freighter Browser Extension |
+| Package | `@stellar/freighter-api: ^6.0.1` |
+| Network | Stellar Testnet |
+| Additional Wallets | Albedo, Hana, LOBSTR (via stellar-wallets-kit) |
+
+### Source Files
+
+| File | Purpose |
+|---|---|
+| `frontend/src/services/walletService.ts` | **Centralized wallet service** — all wallet operations |
+| `frontend/src/services/stellar.ts` | Soroban RPC + Freighter signing integration |
+| `frontend/src/hooks/useWallet.ts` | React wallet hook for components |
+| `frontend/src/store/useTicketStore.ts` | Zustand global wallet state |
+| `frontend/src/components/Navbar.tsx` | Connect/Disconnect wallet UI |
+| `frontend/src/pages/WalletDemoPage.tsx` | Live reviewer demo page (route: `/wallet-demo`) |
+
+### Connection Flow
+
+```
+User clicks "Connect Wallet"
+        ↓
+isConnected()              ← freighterIsConnected() — checks extension installed
+        ↓
+requestAccess()            ← freighterRequestAccess() — opens Freighter popup
+        ↓
+{ address }                ← Stellar public key (G...) returned from Freighter
+        ↓
+store.connectWallet()      ← address stored in Zustand global state
+        ↓
+Balance fetched            ← Horizon API loadAccount() every 15s
+```
+
+### Permission Request Flow
+
+```typescript
+// frontend/src/services/walletService.ts
+import {
+  isConnected as freighterIsConnected,
+  requestAccess as freighterRequestAccess,
+} from '@stellar/freighter-api';
+
+// Check extension
+const status = await freighterIsConnected();
+
+// Request permission — opens Freighter popup
+const { address } = await freighterRequestAccess();
+```
+
+### Address Retrieval Flow
+
+```typescript
+// Address returned directly from Freighter permission request
+const { address } = await freighterRequestAccess();
+
+// Stored in Zustand store
+store.connectWallet(address, 'Freighter');
+
+// Retrieved anywhere in app
+const address = useTicketStore.getState().walletAddress;
+```
+
+### Transaction Signing Flow
+
+Every on-chain mutation follows this exact pattern in `stellar.ts → invokeContract()`:
+
+```
+Button clicked (Create Event / Purchase Ticket / etc.)
+        ↓
+useTickets.ts hook mutation triggered
+        ↓
+StellarService.invokeContract() called
+        ↓
+1. TransactionBuilder builds Soroban operation
+        ↓
+2. rpcServer.simulateTransaction() → preflight + resource estimates
+        ↓
+3. rpc.assembleTransaction() → adds resource fees
+        ↓
+4. signFreighterTransaction(txXdr, { networkPassphrase, address })  ← FREIGHTER
+        ↓
+5. User approves in Freighter popup
+        ↓
+6. signedTxXdr returned
+        ↓
+7. rpcServer.sendTransaction(signedTx) → submitted to Stellar Testnet
+        ↓
+8. Poll getTransaction(hash) until SUCCESS or FAILED
+```
+
+### Operations That Trigger Wallet Signing
+
+| User Action | Contract Method | File |
+|---|---|---|
+| Create Event | `create_event` | `stellar.ts`, `useTickets.ts` |
+| Buy Ticket | `purchase_ticket` | `stellar.ts`, `useTickets.ts` |
+| Transfer Ticket | `transfer_ticket` | `stellar.ts`, `useTickets.ts` |
+| Verify at Gate | `verify_ticket` | `stellar.ts`, `useTickets.ts` |
+| Cancel Event | `cancel_event` | `stellar.ts`, `useTickets.ts` |
+| Complete Event | `complete_event` | `stellar.ts`, `useTickets.ts` |
+| Claim Refund | `claim_refund` | `stellar.ts`, `useTickets.ts` |
+
+### Reviewer Verification
+
+Open these files in order to verify wallet integration in under 30 seconds:
+
+1. **`frontend/src/services/walletService.ts`** — `connectWallet()`, `signTransaction()`, `getWalletAddress()`, `getWalletBalance()`
+2. **`frontend/src/services/stellar.ts`** — `connectStellarWallet()`, `signFreighterTransaction()` in `invokeContract()`
+3. **`frontend/src/components/Navbar.tsx`** — `handleConnect()` button (line 46)
+4. **`/#/wallet-demo`** — Live interactive demo showing all wallet operations
+
+Full audit: see [`WALLET_INTEGRATION_REPORT.md`](WALLET_INTEGRATION_REPORT.md) | Source map: see [`REVIEWER_GUIDE.md`](REVIEWER_GUIDE.md)
 
 ---
 

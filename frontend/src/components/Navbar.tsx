@@ -95,6 +95,7 @@ export const Navbar: React.FC = () => {
           <Link className={linkClass("/dashboard/organizer")} to="/dashboard/organizer">For Organizers</Link>
           <a className="text-on-surface-variant font-medium hover:text-primary transition-colors duration-300 font-body-lg text-body-lg cursor-pointer" onClick={() => navigate('/')}>Pricing</a>
           <Link className={linkClass("/dashboard")} to="/dashboard">Dashboard</Link>
+          <Link className={`${linkClass("/wallet-demo")} border border-violet-500/40 px-3 py-1 rounded-full`} to="/wallet-demo">🔗 Wallet Demo</Link>
         </div>
 
         {/* Mobile: Wallet Button (Top Right) | Desktop: Controls (Right) */}

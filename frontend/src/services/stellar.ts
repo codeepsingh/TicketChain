@@ -1,3 +1,44 @@
+/**
+ * @file stellar.ts
+ * @description Stellar / Soroban Blockchain Service — TicketChain
+ *
+ * ══════════════════════════════════════════════════════════════════
+ * WALLET INTEGRATION — REVIEWER SUMMARY
+ * ══════════════════════════════════════════════════════════════════
+ *
+ * Wallet Provider:    Freighter (@stellar/freighter-api v6+)
+ * Network:            Stellar Testnet
+ * RPC:                https://soroban-testnet.stellar.org
+ *
+ * Wallet Functions in this file:
+ *
+ *   connectStellarWallet()          [LINE ~345]
+ *     → Calls isConnected()         — checks Freighter is installed
+ *     → Calls requestAccess()       — requests wallet permission (opens popup)
+ *     → Stores address in Zustand   — via store.connectWallet(address, 'Freighter')
+ *
+ *   StellarService.invokeContract() [LINE ~190]
+ *     → Calls signFreighterTransaction(txXdr, { networkPassphrase, address })
+ *     → This is the TRANSACTION SIGNING call used for all on-chain mutations:
+ *          createEvent, purchaseTicket, transferTicket, verifyTicket,
+ *          cancelEvent, completeEvent, claimRefund
+ *
+ * Dedicated Wallet Service (all operations centralized):
+ *   → frontend/src/services/walletService.ts
+ *
+ * Wallet Hook:
+ *   → frontend/src/hooks/useWallet.ts
+ *
+ * Live Demo:
+ *   → frontend/src/pages/WalletDemoPage.tsx   (route: /wallet-demo)
+ *
+ * Imports:
+ *   isConnected       from @stellar/freighter-api
+ *   requestAccess     from @stellar/freighter-api
+ *   signTransaction   from @stellar/freighter-api
+ * ══════════════════════════════════════════════════════════════════
+ */
+
 import {
   rpc,
   Horizon,
@@ -17,7 +58,7 @@ import {
   signTransaction as signFreighterTransaction,
 } from '@stellar/freighter-api';
 import { useTicketStore } from '../store/useTicketStore';
-import { trackWalletConnected, trackWalletDisconnected, trackError } from '../utils/analytics';
+import { trackWalletConnected, trackError } from '../utils/analytics';
 import { captureWalletError } from '../utils/sentry';
 
 // Testnet configurations

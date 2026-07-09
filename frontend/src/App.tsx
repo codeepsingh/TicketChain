@@ -20,6 +20,7 @@ import { TicketDetailsPage } from './pages/TicketDetailsPage';
 import { VerifyPage } from './pages/VerifyPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { SettingsPage } from './pages/SettingsPage';
+import { WalletDemoPage } from './pages/WalletDemoPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -138,6 +139,8 @@ const AppInner: React.FC = () => {
           <Route path="/verify" element={<VerifyPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/settings" element={<SettingsPage />} />
+          {/* Wallet Integration Demo — Reviewer Verification */}
+          <Route path="/wallet-demo" element={<WalletDemoPage />} />
         </Routes>
       </div>
       
