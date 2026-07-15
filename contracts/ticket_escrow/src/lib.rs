@@ -216,3 +216,7 @@ impl TicketEscrow {
         env.storage().persistent().get(&deposit_key).unwrap_or(0)
     }
 }
+
+#[cfg(test)]
+mod test;
+

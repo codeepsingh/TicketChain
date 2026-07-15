@@ -1,157 +1,103 @@
-# 🗺️ Reviewer Guide — TicketChain Source Code Map
+# 🗺️ Reviewer Guide — TicketChain
 
-> **Purpose:** Help a reviewer find wallet integration within 30 seconds of opening this repository.
-
----
-
-## ⚡ 30-Second Verification Path
-
-```
-1. Open:  frontend/src/services/walletService.ts
-          → connectWallet()       ← requestAccess() call
-          → signTransaction()     ← freighterSignTransaction() call
-          → getWalletAddress()    ← address from Freighter
-          → getWalletBalance()    ← Horizon API balance
-
-2. Open:  frontend/src/services/stellar.ts
-          → connectStellarWallet()     [line ~385]  ← Freighter connection
-          → StellarService.invokeContract() [line ~230] ← signFreighterTransaction()
-
-3. Open:  frontend/src/components/Navbar.tsx
-          → handleConnect()            [line 46]    ← Connect Wallet button
-
-4. Visit: /#/wallet-demo               ← Live interactive demo page
-```
+This guide is designed to help a reviewer verify all required files, contract structures, tests, wallet integrations, and deployment configurations of the **TicketChain** repository in **less than 60 seconds**.
 
 ---
 
-## 📂 Repository Structure
+## 1. Smart Contracts
 
-```
-ticketchain_/
-├── README.md                          ← Wallet integration section included
-├── WALLET_INTEGRATION_REPORT.md       ← Full wallet audit document
-├── REVIEWER_GUIDE.md                  ← This file
-├── LEVEL1_RESUBMISSION_REPORT.md      ← Resubmission evidence package
-│
-├── contracts/
-│   ├── ticket_manager/                ← Soroban smart contract (Rust)
-│   └── ticket_escrow/                 ← Escrow contract (Rust)
-│
-└── frontend/
-    └── src/
-        ├── services/
-        │   ├── walletService.ts       ← ★ PRIMARY WALLET SERVICE
-        │   └── stellar.ts             ← Soroban + Freighter integration
-        │
-        ├── hooks/
-        │   ├── useWallet.ts           ← ★ WALLET REACT HOOK
-        │   └── useTickets.ts          ← On-chain mutations (use signTransaction)
-        │
-        ├── store/
-        │   └── useTicketStore.ts      ← Zustand wallet state
-        │
-        ├── components/
-        │   └── Navbar.tsx             ← ★ CONNECT WALLET BUTTON
-        │
-        └── pages/
-            └── WalletDemoPage.tsx     ← ★ LIVE REVIEWER DEMO (route: /wallet-demo)
-```
+All smart contract logic is written in Rust using the Soroban SDK.
+
+**Exact files to inspect:**
+- **Workspace Cargo Configuration**: [contracts/Cargo.toml](file:///c:/Users/Arya%20Bhagat/Desktop/ticketchain_/contracts/Cargo.toml) (Defines workspace members: `ticket_manager` and `ticket_escrow`)
+- **Workspace Lockfile**: [contracts/Cargo.lock](file:///c:/Users/Arya%20Bhagat/Desktop/ticketchain_/contracts/Cargo.lock) (Dependency lockfile)
+- **Workspace Makefile**: [contracts/Makefile](file:///c:/Users/Arya%20Bhagat/Desktop/ticketchain_/contracts/Makefile) (Orchestrates contract build/test workflows)
+- **TicketManager Package**:
+  - [contracts/ticket_manager/Cargo.toml](file:///c:/Users/Arya%20Bhagat/Desktop/ticketchain_/contracts/ticket_manager/Cargo.toml) (Package dependencies)
+  - [contracts/ticket_manager/Makefile](file:///c:/Users/Arya%20Bhagat/Desktop/ticketchain_/contracts/ticket_manager/Makefile) (Local build commands)
+  - [contracts/ticket_manager/README.md](file:///c:/Users/Arya%20Bhagat/Desktop/ticketchain_/contracts/ticket_manager/README.md) (Contract documentation)
+  - [contracts/ticket_manager/src/lib.rs](file:///c:/Users/Arya%20Bhagat/Desktop/ticketchain_/contracts/ticket_manager/src/lib.rs) (Core entrypoints: `create_event`, `purchase_ticket`, `transfer_ticket`, `verify_ticket`, `cancel_event`, `claim_refund`, `complete_event`)
+  - [contracts/ticket_manager/src/types.rs](file:///c:/Users/Arya%20Bhagat/Desktop/ticketchain_/contracts/ticket_manager/src/types.rs) (Data structures and storage keys)
+- **TicketEscrow Package**:
+  - [contracts/ticket_escrow/Cargo.toml](file:///c:/Users/Arya%20Bhagat/Desktop/ticketchain_/contracts/ticket_escrow/Cargo.toml) (Package dependencies)
+  - [contracts/ticket_escrow/Makefile](file:///c:/Users/Arya%20Bhagat/Desktop/ticketchain_/contracts/ticket_escrow/Makefile) (Local build commands)
+  - [contracts/ticket_escrow/README.md](file:///c:/Users/Arya%20Bhagat/Desktop/ticketchain_/contracts/ticket_escrow/README.md) (Contract documentation)
+  - [contracts/ticket_escrow/src/lib.rs](file:///c:/Users/Arya%20Bhagat/Desktop/ticketchain_/contracts/ticket_escrow/src/lib.rs) (Escrow logic: `initialize`, `setup_escrow`, `record_deposit`, `release_payout`, `enable_refunds`, `refund_buyer`)
 
 ---
 
-## 🔌 Wallet Connection
+## 2. Tests
 
-| What | Where | Function |
-|---|---|---|
-| Connection check | `walletService.ts` | `checkConnection()` → `isConnected()` |
-| Permission request | `walletService.ts` | `connectWallet()` → `requestAccess()` |
-| Legacy connection | `stellar.ts` | `connectStellarWallet()` → `requestFreighterAccess()` |
-| Store wallet state | `useTicketStore.ts` | `connectWallet(address, walletName)` |
-| UI Connect button | `Navbar.tsx` | `handleConnect()` → `connectStellarWallet()` |
+The contract workspace contains complete unit and integration tests written using Soroban's mock environment testing tools.
 
----
-
-## 🔑 Wallet Permissions
-
-| What | Where | API |
-|---|---|---|
-| Request permission | `walletService.ts:95` | `freighterRequestAccess()` |
-| Also in | `stellar.ts:403` | `requestFreighterAccess()` |
-| Package | `package.json` | `@stellar/freighter-api: ^6.0.1` |
+**Exact files to inspect:**
+- **TicketManager Integration Tests**: [contracts/ticket_manager/src/test.rs](file:///c:/Users/Arya%20Bhagat/Desktop/ticketchain_/contracts/ticket_manager/src/test.rs)
+  - Verifies: Event creation, ticket purchase & minting, ticket transfer, gate verification, event cancellation & refund flows, and event completion with payout.
+- **TicketEscrow Unit Tests**: [contracts/ticket_escrow/src/test.rs](file:///c:/Users/Arya%20Bhagat/Desktop/ticketchain_/contracts/ticket_escrow/src/test.rs)
+  - Verifies: Escrow initialization, deposit recording, organizer payouts, refund activation, and buyer refunds.
 
 ---
 
-## 📫 Address Retrieval
+## 3. Wallet Integration
 
-| What | Where | Returns |
-|---|---|---|
-| From Freighter | `walletService.ts` | `const { address } = await requestAccess()` |
-| From store | `walletService.ts` | `getWalletAddress()` → `store.walletAddress` |
-| In store | `useTicketStore.ts` | `walletAddress: string \| null` |
-| Used in hooks | `useTickets.ts` | `store.walletAddress` (guards all mutations) |
+The frontend utilizes the `@stellar/freighter-api` package to integrate with the Freighter browser wallet extension.
 
----
-
-## ✍️ Transaction Signing
-
-| What | Where | API |
-|---|---|---|
-| Sign wrapper | `walletService.ts:170` | `signTransaction(txXdr, address)` |
-| In Soroban flow | `stellar.ts:228` | `signFreighterTransaction(txXdr, {...})` |
-| Full flow | `stellar.ts:invokeContract()` | Build → Simulate → Assemble → **Sign** → Submit |
-| Operations signed | `useTickets.ts` | createEvent, purchaseTicket, transferTicket, verifyTicket, cancelEvent, completeEvent, claimRefund |
+**Exact files to inspect:**
+- **Central Wallet Service**: [frontend/src/services/walletService.ts](file:///c:/Users/Arya%20Bhagat/Desktop/ticketchain_/frontend/src/services/walletService.ts)
+  - `checkConnection` (line 46) — Detects Freighter installation.
+  - `connectWallet` (line 72) — Requests access and retrieves user address.
+  - `disconnectWallet` (line 117) — Clears connection states.
+  - `getWalletBalance` (line 145) — Fetches XLM balance via Horizon API.
+- **React Wallet Hook**: [frontend/src/hooks/useWallet.ts](file:///c:/Users/Arya%20Bhagat/Desktop/ticketchain_/frontend/src/hooks/useWallet.ts)
+  - Exposes reactive wallet states and methods (`isConnected`, `address`, `balance`, `connect`, `disconnect`).
+- **Navbar Button Trigger**: [frontend/src/components/Navbar.tsx](file:///c:/Users/Arya%20Bhagat/Desktop/ticketchain_/frontend/src/components/Navbar.tsx)
+  - `handleConnect` (line 46) — Handles the button click and connects Freighter.
 
 ---
 
-## 💰 Balance Fetching
+## 4. Transaction Signing
 
-| What | Where | API |
-|---|---|---|
-| Service | `walletService.ts:145` | `getWalletBalance(address)` |
-| Also in | `stellar.ts` | `StellarService.getAccountBalance(address)` |
-| Auto-sync | `App.tsx:105` | 15-second interval via `setInterval` |
+Mutating smart contract calls are signed by Freighter using the transaction envelope XDR format.
 
----
-
-## 📦 Smart Contracts
-
-| Contract | Address | Purpose |
-|---|---|---|
-| Ticket Manager | `CA5PG7SDYI7X6AJMRBX6DZL5LA4YT5I7WECPH347FDSSOBDU73GUZ76O` | Event creation, ticket management |
-| Ticket Escrow | `CCHIMKSGFIOLMENQCLWSADERPFKFSMTLOWTWUYARBE6J4FGS6BKSY3S3` | Funds escrow, refunds, payouts |
+**Exact files to inspect:**
+- **Soroban Service Invoker**: [frontend/src/services/stellar.ts](file:///c:/Users/Arya%20Bhagat/Desktop/ticketchain_/frontend/src/services/stellar.ts)
+  - `StellarService.invokeContract` (line 231) — Builds the Soroban transaction, simulates footprint and resource limits using preflight, and calls `signFreighterTransaction` (line 267) to display the user authorization popup.
+- **Wallet Service Signer**: [frontend/src/services/walletService.ts](file:///c:/Users/Arya%20Bhagat/Desktop/ticketchain_/frontend/src/services/walletService.ts)
+  - `signTransaction` (line 179) — Exposes a standalone signed transaction helper calling Freighter's `signTransaction`.
 
 ---
 
-## 🧪 CI/CD Pipeline
+## 5. Frontend Integration
 
-| Job | What | Status |
-|---|---|---|
-| `contracts` | `cargo build --target wasm32-unknown-unknown` | ✅ Configured |
-| `contracts` | `cargo test` | ✅ Configured |
-| `frontend` | `npm ci` + `npm run test` | ✅ Configured |
-| `frontend` | `npm run build` | ✅ Configured |
-| `deploy` | Netlify (gracefully skips if no secrets) | ✅ Configured |
+Frontend mutations consume custom React hooks to invoke signed Soroban transactions and update the UI states.
 
-**File:** `.github/workflows/ci-cd.yml`
-
----
-
-## 🖥️ Live Demo
-
-**Route:** `/#/wallet-demo`
-
-**Direct URL:** `https://ticketchain1.netlify.app/#/wallet-demo`
-
-This page demonstrates:
-- ✅ Connect Wallet (live Freighter popup)
-- ✅ Disconnect Wallet
-- ✅ Address display
-- ✅ Balance fetching
-- ✅ Transaction signing (demo XDR)
-- ✅ Connection status
-- ✅ Code evidence blocks
+**Exact files to inspect:**
+- **Ticketing Operations Hooks**: [frontend/src/hooks/useTickets.ts](file:///c:/Users/Arya%20Bhagat/Desktop/ticketchain_/frontend/src/hooks/useTickets.ts)
+  - `useCreateEvent` (line 57) — Triggers `StellarService.createEvent`.
+  - `usePurchaseTicket` (line 131) — Triggers `StellarService.purchaseTicket`.
+  - `useTransferTicket` (line 224) — Triggers `StellarService.transferTicket`.
+  - `useVerifyTicket` (line 294) — Triggers `StellarService.verifyTicket`.
+  - `useCancelEvent` (line 358) — Triggers `StellarService.cancelEvent`.
+  - `useClaimRefund` (line 420) — Triggers `StellarService.claimRefund`.
+  - `useCompleteEvent` (line 481) — Triggers `StellarService.completeEvent`.
 
 ---
 
-*TicketChain — Stellar SCF Hackathon Submission*
+## 6. CI/CD
+
+Continuous Integration builds, tests, and deploys both contract and frontend code on every push or pull request.
+
+**Exact files to inspect:**
+- **GitHub Actions Workflow**: [.github/workflows/ci-cd.yml](file:///c:/Users/Arya%20Bhagat/Desktop/ticketchain_/.github/workflows/ci-cd.yml)
+  - `contracts` job (line 14) — Sets up Rust and targets `wasm32-unknown-unknown`, runs cargo build and cargo test.
+  - `frontend` job (line 40) — Installs node packages, runs vitest tests, builds Vite application, and triggers deployment.
+
+---
+
+## 7. Deployment
+
+Static assets are hosted and deployed on Netlify.
+
+**Exact files to inspect:**
+- **Netlify configuration**: [netlify.toml](file:///c:/Users/Arya%20Bhagat/Desktop/ticketchain_/netlify.toml)
+  - Configures the build settings (`base = "frontend"`, `command = "npm run build"`, `publish = "dist"`) and routing rules (`/*` redirects to `/index.html` for single-page routing).
