@@ -13,22 +13,6 @@ TicketChain eliminates ticket fraud, counterfeiting, and scalping by issuing eve
 
 ---
 
-## ⚡ Reviewer Quick Links
-
-- 📦 **Smart Contracts**: [contracts/Makefile](file:///c:/Users/Arya%20Bhagat/Desktop/ticketchain_/contracts/Makefile), [contracts/ticket_manager/src/lib.rs](file:///c:/Users/Arya%20Bhagat/Desktop/ticketchain_/contracts/ticket_manager/src/lib.rs), [contracts/ticket_escrow/src/lib.rs](file:///c:/Users/Arya%20Bhagat/Desktop/ticketchain_/contracts/ticket_escrow/src/lib.rs)
-- 🧪 **Tests**: [contracts/ticket_manager/src/test.rs](file:///c:/Users/Arya%20Bhagat/Desktop/ticketchain_/contracts/ticket_manager/src/test.rs), [contracts/ticket_escrow/src/test.rs](file:///c:/Users/Arya%20Bhagat/Desktop/ticketchain_/contracts/ticket_escrow/src/test.rs)
-- 🔌 **Wallet Integration**: [frontend/src/services/walletService.ts](file:///c:/Users/Arya%20Bhagat/Desktop/ticketchain_/frontend/src/services/walletService.ts), [frontend/src/hooks/useWallet.ts](file:///c:/Users/Arya%20Bhagat/Desktop/ticketchain_/frontend/src/hooks/useWallet.ts)
-- ✍️ **Transaction Signing**: [frontend/src/services/stellar.ts](file:///c:/Users/Arya%20Bhagat/Desktop/ticketchain_/frontend/src/services/stellar.ts) (`invokeContract()` at line 231)
-- 📱 **Frontend Integration**: [frontend/src/hooks/useTickets.ts](file:///c:/Users/Arya%20Bhagat/Desktop/ticketchain_/frontend/src/hooks/useTickets.ts) (React Query hooks wrapping Soroban calls)
-- 🚀 **CI/CD**: [.github/workflows/ci-cd.yml](file:///c:/Users/Arya%20Bhagat/Desktop/ticketchain_/.github/workflows/ci-cd.yml) (Automated test/build/deploy)
-- 🌐 **Deployment**: [netlify.toml](file:///c:/Users/Arya%20Bhagat/Desktop/ticketchain_/netlify.toml) (Production configuration)
-- 🔑 **Contract Addresses**:
-  - `TicketManager`: [`CA5PG7SDYI7X6AJMRBX6DZL5LA4YT5I7WECPH347FDSSOBDU73GUZ76O`](https://stellar.expert/explorer/testnet/contract/CA5PG7SDYI7X6AJMRBX6DZL5LA4YT5I7WECPH347FDSSOBDU73GUZ76O)
-  - `TicketEscrow`: [`CCHIMKSGFIOLMENQCLWSADERPFKFSMTLOWTWUYARBE6J4FGS6BKSY3S3`](https://stellar.expert/explorer/testnet/contract/CCHIMKSGFIOLMENQCLWSADERPFKFSMTLOWTWUYARBE6J4FGS6BKSY3S3)
-- 🖥️ **Live Demo**: [https://ticketchain1.netlify.app](https://ticketchain1.netlify.app)
-
----
-
 ## Table of Contents
 
 - [Problem Statement](#problem-statement)
